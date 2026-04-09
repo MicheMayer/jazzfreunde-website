@@ -3,12 +3,22 @@
 namespace Jazzfreunde\App\Type\Primitive;
 
 use Stringable;
+use InvalidArgumentException;
 
 /**
  * Interface for primitive types
  */
 interface PrimitiveTypeInterface extends Stringable
 {
+    /**
+     * Create a new instance from a value
+     *
+     * @param mixed $value
+     * @return static
+     * @throws InvalidArgumentException if the value is invalid
+     */
+    public static function from(mixed $value): static;
+
     /**
      * Create a new instance from a value
      *

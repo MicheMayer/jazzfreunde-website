@@ -25,7 +25,7 @@ final class TwigTemplate extends Constraint
      */
     public function __construct(?string $message = null, ?array $groups = null, $payload = null)
     {
-        parent::__construct([], $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
     }

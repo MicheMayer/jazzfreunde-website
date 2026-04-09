@@ -90,11 +90,9 @@ final class UnitUnderTest
 
         $mock = (new MockGenerator)->testDouble(
             $class,
-            true,
+            mockObject: true,
             callOriginalConstructor: false,
             callOriginalClone: false,
-            cloneArguments: false,
-            allowMockingUnknownTypes: false,
         );
 
         assert($mock instanceof $class);

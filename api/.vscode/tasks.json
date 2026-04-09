@@ -80,9 +80,12 @@
             "command": "bin/phpunit",
             "args": [
                 "--testdox",
-                "--teamcity",
-                "--testsuite=full",
-                "--display-notices"
+                "--testsuite=unit,integration,functional",
+                "--display-notices",
+                "--display-phpunit-notices",
+                "--display-deprecations",
+                "--display-phpunit-deprecations",
+                "--display-warnings"
             ],
             "options": {
                 "cwd": "${workspaceFolder}",

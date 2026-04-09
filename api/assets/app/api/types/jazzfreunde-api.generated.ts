@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/already_subscribed_errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Retrieves a AlreadySubscribedError resource.
+         * @description Retrieves a AlreadySubscribedError resource.
+         */
+        get: operations["api_already_subscribed_errors_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events": {
         parameters: {
             query?: never;
@@ -44,7 +64,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/event_locations/{id}": {
+    "/api/notification_subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Creates a NotificationSubscription resource.
+         * @description Creates a NotificationSubscription resource.
+         */
+        post: operations["api_notification_subscriptions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/retry_subscribing_errors": {
         parameters: {
             query?: never;
             header?: never;
@@ -52,10 +92,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Retrieves a EventLocation resource.
-         * @description Retrieves a EventLocation resource.
+         * Retrieves a RetrySubscribingError resource.
+         * @description Retrieves a RetrySubscribingError resource.
          */
-        get: operations["api_event_locations_id_get"];
+        get: operations["api_retry_subscribing_errors_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -68,6 +108,24 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AlreadySubscribedError: {
+            /** @default  */
+            readonly message: string;
+            /** @default 0 */
+            readonly code: number;
+            /** @default  */
+            readonly file: string;
+            /** @default 0 */
+            readonly line: number;
+            readonly type?: string;
+            readonly title?: string | null;
+            readonly status?: number | null;
+            readonly detail?: string | null;
+            readonly instance?: string | null;
+            readonly trace?: (string | null)[];
+            readonly previous?: components["schemas"]["Throwable"] | null;
+            readonly traceAsString?: string;
+        };
         /** @description A representation of common errors. */
         Error: {
             /** @description A short, human-readable summary of the problem. */
@@ -78,32 +136,15 @@ export interface components {
              * @default 400
              * @example 404
              */
-            status: number;
+            status: number | null;
             /** @description A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced. */
             readonly instance?: string | null;
             /** @description A URI reference that identifies the problem type */
             readonly type?: string;
         };
-        /** @description A representation of common errors. */
-        "Error.jsonld": {
-            /** @description A short, human-readable summary of the problem. */
-            readonly title?: string | null;
-            /** @description A human-readable explanation specific to this occurrence of the problem. */
-            readonly detail?: string | null;
-            /**
-             * @default 400
-             * @example 404
-             */
-            status: number;
-            /** @description A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced. */
-            readonly instance?: string | null;
-            /** @description A URI reference that identifies the problem type */
-            readonly type?: string;
-            readonly description?: string | null;
-        };
-        /** @description Terminierte Veranstaltung */
+        /** @description API resource for planned events (e.g., concerts, meetings, etc.) */
         Event: {
-            readonly id?: number;
+            id?: number | null;
             title: string;
             /** Format: date-time */
             start: string;
@@ -114,7 +155,23 @@ export interface components {
             link?: string | null;
             /**
              * @default none
-             * @example none
+             * @enum {string}
+             */
+            category: "none" | "session" | "jazztage" | "jazz-and-literature";
+        };
+        /** @description API resource for planned events (e.g., concerts, meetings, etc.) */
+        "Event.html": {
+            id?: number | null;
+            title: string;
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            location: components["schemas"]["EventLocation.html"];
+            subtitle?: string | null;
+            link?: string | null;
+            /**
+             * @default none
              * @enum {string}
              */
             category: "none" | "session" | "jazztage" | "jazz-and-literature";
@@ -122,6 +179,53 @@ export interface components {
         EventLocation: {
             readonly id?: number;
             name: string;
+            value?: string;
+        };
+        "EventLocation.html": {
+            readonly id?: number;
+            name: string;
+            value?: string;
+        };
+        /** @description Subscription for any type of notifications */
+        NotificationSubscription: {
+            /** @example /events/123 */
+            resourceScope: string;
+            /** Format: email */
+            email: string;
+        };
+        /** @description Subscription for any type of notifications */
+        "NotificationSubscription.html": {
+            /** @example /events/123 */
+            resourceScope: string;
+            /** Format: email */
+            email: string;
+        };
+        RetrySubscribingError: {
+            /** @default  */
+            readonly message: string;
+            /** @default 0 */
+            readonly code: number;
+            /** @default  */
+            readonly file: string;
+            /** @default 0 */
+            readonly line: number;
+            readonly type?: string;
+            readonly title?: string | null;
+            readonly status?: number | null;
+            readonly detail?: string | null;
+            readonly instance?: string | null;
+            readonly trace?: (string | null)[];
+            readonly previous?: components["schemas"]["Throwable"] | null;
+            readonly traceAsString?: string;
+        };
+        Throwable: {
+            readonly message?: string;
+            readonly code?: unknown;
+            readonly file?: string;
+            readonly line?: number;
+            readonly trace?: (string | null)[];
+            readonly previous?: components["schemas"]["Throwable"] | null;
+            readonly traceAsString?: string;
         };
     };
     responses: never;
@@ -132,6 +236,37 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    api_already_subscribed_errors_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description AlreadySubscribedError resource */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AlreadySubscribedError"];
+                    "application/json": components["schemas"]["AlreadySubscribedError"];
+                };
+            };
+        };
+    };
     api_events_get_collection: {
         parameters: {
             query?: {
@@ -158,7 +293,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Event"][];
-                    "text/html": components["schemas"]["Event"][];
+                    "text/html": components["schemas"]["Event.html"][];
                 };
             };
         };
@@ -182,7 +317,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Event"];
-                    "text/html": components["schemas"]["Event"];
+                    "text/html": components["schemas"]["Event.html"];
                 };
             };
             /** @description Not found */
@@ -191,44 +326,76 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/ld+json": components["schemas"]["Error.jsonld"];
                     "application/problem+json": components["schemas"]["Error"];
                     "application/json": components["schemas"]["Error"];
                 };
             };
         };
     };
-    api_event_locations_id_get: {
+    api_notification_subscriptions_post: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                /** @description EventLocation identifier */
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        /** @description The new NotificationSubscription resource */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationSubscription"];
+                "text/html": components["schemas"]["NotificationSubscription.html"];
+            };
+        };
         responses: {
-            /** @description EventLocation resource */
-            200: {
+            /** @description NotificationSubscription resource created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EventLocation"];
-                    "text/html": components["schemas"]["EventLocation"];
+                    "application/json": components["schemas"]["NotificationSubscription"];
+                    "text/html": components["schemas"]["NotificationSubscription.html"];
                 };
             };
+            /** @description Already subscribed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["AlreadySubscribedError"];
+                    "application/json": components["schemas"]["AlreadySubscribedError"];
+                };
+            };
+        };
+    };
+    api_retry_subscribing_errors_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
             /** @description Not found */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/ld+json": components["schemas"]["Error.jsonld"];
                     "application/problem+json": components["schemas"]["Error"];
                     "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description RetrySubscribingError resource */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["RetrySubscribingError"];
+                    "application/json": components["schemas"]["RetrySubscribingError"];
                 };
             };
         };

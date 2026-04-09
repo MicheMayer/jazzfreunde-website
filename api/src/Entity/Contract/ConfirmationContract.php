@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Jazzfreunde\App\DependencyInjection\PropertyInjectionTrait;
 use Jazzfreunde\App\Entity\Type\Enum\Contract\ConfirmationStateEnumType;
 use Jazzfreunde\App\Entity\Type\String\HexTokenType;
+use Jazzfreunde\App\Repository\ConfirmationContractRepository;
 use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 use Jazzfreunde\App\Type\Primitive\HexToken;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Confirmation contract authorized by a user
  * @psalm-api
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ConfirmationContractRepository::class)]
 #[ORM\Table(name: 'confirmation_contracts')]
 class ConfirmationContract
 {

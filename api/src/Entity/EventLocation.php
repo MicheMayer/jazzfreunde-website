@@ -21,10 +21,21 @@ class EventLocation
 {
     use PropertyInjectionTrait;
 
+    /**
+     * Unique identifier in the database
+     *
+     * @var int|null
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     public ?int $id = null;
+
+    /**
+     * Name of the location
+     *
+     * @var string
+     */
     #[ORM\Column(type: 'string')]
     #[API\ApiProperty(required: true)]
     public string $name;

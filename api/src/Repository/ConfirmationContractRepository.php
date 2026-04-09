@@ -7,7 +7,7 @@ namespace Jazzfreunde\App\Repository;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
-use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingService;
+use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingInterface;
 use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 use RuntimeException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,7 +17,7 @@ use Throwable;
  * Repository for managing {@see ConfirmationContract} entities.
  * @psalm-api
  */
-final class ConfirmationContractRepository extends ServiceEntityRepository implements ConfirmationContractPurgingService
+final class ConfirmationContractRepository extends ServiceEntityRepository implements ConfirmationContractPurgingInterface
 {
     /**
      * Init repository

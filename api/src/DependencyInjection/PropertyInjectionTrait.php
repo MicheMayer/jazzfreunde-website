@@ -36,7 +36,8 @@ use function call_user_func;
 use function is_a;
 
 /**
- * Trait zum schnellen Initialisieren von Objekten.
+ * Trait to inject properties into an object.
+ * As of the introduction of symfonies object mapper (https://symfony.com/doc/7.4/object_mapper.html) this trait is only used by Doctine ORM
  */
 trait PropertyInjectionTrait
 {
@@ -50,7 +51,9 @@ trait PropertyInjectionTrait
      *
      * @param mixed ...$params
      * @psalm-suppress UndefinedThisPropertyFetch
+     * @deprecated 2026-04-26 Use Symfony's Object Mapper instead
      */
+    #[\Deprecated(message: "use symfony object mapper instead", since: "2026.04.26")]
     public function __construct(mixed ...$params)
     {
         if (!ArrayUtil::isAssociativeArray($params)) {

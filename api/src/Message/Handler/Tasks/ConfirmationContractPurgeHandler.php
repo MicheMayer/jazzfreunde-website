@@ -3,7 +3,7 @@
 namespace Jazzfreunde\App\Message\Handler\Tasks;
 
 use Jazzfreunde\App\Message\Messages\Tasks\PurgeVacantConfirmationContractsMessage;
-use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingService;
+use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
@@ -17,10 +17,10 @@ class ConfirmationContractPurgeHandler
     /**
      * Dependency injection
      *
-     * @param  ConfirmationContractPurgingService $confirmationContractRepository
+     * @param  ConfirmationContractPurgingInterface $confirmationContractRepository
      */
     public function __construct(
-        private ConfirmationContractPurgingService $confirmationContractRepository,
+        private ConfirmationContractPurgingInterface $confirmationContractRepository,
     ) {
     }
 

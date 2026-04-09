@@ -8,6 +8,34 @@ servers:
     url: /
     description: ''
 paths:
+  /api/already_subscribed_errors:
+    get:
+      operationId: api_already_subscribed_errors_get
+      tags:
+        - AlreadySubscribedError
+      responses:
+        '409':
+          description: 'AlreadySubscribedError resource'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/AlreadySubscribedError'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlreadySubscribedError'
+        '404':
+          description: 'Not found'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a AlreadySubscribedError resource.'
+      description: 'Retrieves a AlreadySubscribedError resource.'
+      parameters: []
   /api/events:
     get:
       operationId: api_events_get_collection
@@ -26,7 +54,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Event'
+                  $ref: '#/components/schemas/Event.html'
       summary: 'Retrieves the collection of Event resources.'
       description: 'Retrieves the collection of Event resources.'
       parameters:
@@ -36,82 +64,70 @@ paths:
           description: 'The collection page number'
           required: false
           deprecated: false
-          allowEmptyValue: true
           schema:
             type: integer
             default: 1
           style: form
           explode: false
-          allowReserved: false
         -
           name: itemsPerPage
           in: query
           description: 'The number of items per page'
           required: false
           deprecated: false
-          allowEmptyValue: true
           schema:
             type: integer
             default: 30
             minimum: 0
+            maximum: 30
           style: form
           explode: false
-          allowReserved: false
         -
           name: 'start[before]'
           in: query
           description: ''
           required: false
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
           style: form
           explode: false
-          allowReserved: false
         -
           name: 'start[strictly_before]'
           in: query
           description: ''
           required: false
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
           style: form
           explode: false
-          allowReserved: false
         -
           name: 'start[after]'
           in: query
           description: ''
           required: false
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
           style: form
           explode: false
-          allowReserved: false
         -
           name: 'start[strictly_after]'
           in: query
           description: ''
           required: false
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
           style: form
           explode: false
-          allowReserved: false
         -
           name: 'order[start]'
           in: query
           description: ''
           required: false
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
             default: asc
@@ -120,8 +136,6 @@ paths:
               - desc
           style: form
           explode: false
-          allowReserved: false
-      deprecated: false
   '/api/events/{id}':
     get:
       operationId: api_events_id_get
@@ -136,13 +150,10 @@ paths:
                 $ref: '#/components/schemas/Event'
             text/html:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/Event.html'
         '404':
           description: 'Not found'
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Error.jsonld'
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Error'
@@ -159,34 +170,67 @@ paths:
           description: 'Event identifier'
           required: true
           deprecated: false
-          allowEmptyValue: false
           schema:
             type: string
           style: simple
           explode: false
-          allowReserved: false
-      deprecated: false
-  '/api/event_locations/{id}':
-    get:
-      operationId: api_event_locations_id_get
+  /api/notification_subscriptions:
+    post:
+      operationId: api_notification_subscriptions_post
       tags:
-        - EventLocation
+        - NotificationSubscription
       responses:
-        '200':
-          description: 'EventLocation resource'
+        '409':
+          description: 'Already subscribed'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/AlreadySubscribedError'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlreadySubscribedError'
+          links: {  }
+        '201':
+          description: 'NotificationSubscription resource created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EventLocation'
+                $ref: '#/components/schemas/NotificationSubscription'
             text/html:
               schema:
-                $ref: '#/components/schemas/EventLocation'
+                $ref: '#/components/schemas/NotificationSubscription.html'
+          links: {  }
+      summary: 'Creates a NotificationSubscription resource.'
+      description: 'Creates a NotificationSubscription resource.'
+      parameters: []
+      requestBody:
+        description: 'The new NotificationSubscription resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSubscription'
+          text/html:
+            schema:
+              $ref: '#/components/schemas/NotificationSubscription.html'
+        required: true
+  /api/retry_subscribing_errors:
+    get:
+      operationId: api_retry_subscribing_errors_get
+      tags:
+        - RetrySubscribingError
+      responses:
+        '409':
+          description: 'RetrySubscribingError resource'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RetrySubscribingError'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrySubscribingError'
         '404':
           description: 'Not found'
           content:
-            application/ld+json:
-              schema:
-                $ref: '#/components/schemas/Error.jsonld'
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Error'
@@ -194,28 +238,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           links: {  }
-      summary: 'Retrieves a EventLocation resource.'
-      description: 'Retrieves a EventLocation resource.'
-      parameters:
-        -
-          name: id
-          in: path
-          description: 'EventLocation identifier'
-          required: true
-          deprecated: false
-          allowEmptyValue: false
-          schema:
-            type: string
-          style: simple
-          explode: false
-          allowReserved: false
-      deprecated: false
+      summary: 'Retrieves a RetrySubscribingError resource.'
+      description: 'Retrieves a RetrySubscribingError resource.'
+      parameters: []
 components:
   schemas:
+    AlreadySubscribedError:
+      type: object
+      properties:
+        message:
+          readOnly: true
+          default: ''
+          type: string
+        code:
+          readOnly: true
+          default: 0
+          type: integer
+        file:
+          readOnly: true
+          default: ''
+          type: string
+        line:
+          readOnly: true
+          default: 0
+          type: integer
+        type:
+          readOnly: true
+          type: string
+        title:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        status:
+          readOnly: true
+          type:
+            - integer
+            - 'null'
+        detail:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        instance:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        trace:
+          readOnly: true
+          type: array
+          items:
+            type:
+              - string
+              - 'null'
+        previous:
+          anyOf:
+            -
+              $ref: '#/components/schemas/Throwable'
+            -
+              type: 'null'
+          readOnly: true
+        traceAsString:
+          readOnly: true
+          type: string
     Error:
       type: object
       description: 'A representation of common errors.'
-      deprecated: false
       properties:
         title:
           readOnly: true
@@ -230,8 +319,11 @@ components:
             - string
             - 'null'
         status:
-          type: number
-          example: 404
+          type:
+            - number
+            - 'null'
+          examples:
+            - 404
           default: 400
         instance:
           readOnly: true
@@ -243,50 +335,14 @@ components:
           readOnly: true
           description: 'A URI reference that identifies the problem type'
           type: string
-    Error.jsonld:
-      type: object
-      description: 'A representation of common errors.'
-      deprecated: false
-      properties:
-        title:
-          readOnly: true
-          description: 'A short, human-readable summary of the problem.'
-          type:
-            - string
-            - 'null'
-        detail:
-          readOnly: true
-          description: 'A human-readable explanation specific to this occurrence of the problem.'
-          type:
-            - string
-            - 'null'
-        status:
-          type: number
-          example: 404
-          default: 400
-        instance:
-          readOnly: true
-          description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.'
-          type:
-            - string
-            - 'null'
-        type:
-          readOnly: true
-          description: 'A URI reference that identifies the problem type'
-          type: string
-        description:
-          readOnly: true
-          type:
-            - string
-            - 'null'
     Event:
       type: object
-      description: 'Terminierte Veranstaltung'
-      deprecated: false
+      description: 'API resource for planned events (e.g., concerts, meetings, etc.)'
       properties:
         id:
-          readOnly: true
-          type: integer
+          type:
+            - integer
+            - 'null'
         title:
           type: string
         start:
@@ -307,7 +363,46 @@ components:
             - 'null'
         category:
           default: none
-          example: none
+          type: string
+          enum:
+            - none
+            - session
+            - jazztage
+            - jazz-and-literature
+      required:
+        - title
+        - start
+        - end
+        - location
+        - category
+    Event.html:
+      type: object
+      description: 'API resource for planned events (e.g., concerts, meetings, etc.)'
+      properties:
+        id:
+          type:
+            - integer
+            - 'null'
+        title:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        location:
+          $ref: '#/components/schemas/EventLocation.html'
+        subtitle:
+          type:
+            - string
+            - 'null'
+        link:
+          type:
+            - string
+            - 'null'
+        category:
+          default: none
           type: string
           enum:
             - none
@@ -322,16 +417,150 @@ components:
         - category
     EventLocation:
       type: object
-      description: ''
-      deprecated: false
       properties:
         id:
           readOnly: true
           type: integer
         name:
           type: string
+        value:
+          writeOnly: true
+          type: string
       required:
         - name
+    EventLocation.html:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: integer
+        name:
+          type: string
+        value:
+          writeOnly: true
+          type: string
+      required:
+        - name
+    NotificationSubscription:
+      type: object
+      description: 'Subscription for any type of notifications'
+      required:
+        - resourceScope
+        - email
+      properties:
+        resourceScope:
+          type: string
+          example: /events/123
+        email:
+          format: email
+          externalDocs:
+            url: 'https://schema.org/email'
+          type: string
+    NotificationSubscription.html:
+      type: object
+      description: 'Subscription for any type of notifications'
+      required:
+        - resourceScope
+        - email
+      properties:
+        resourceScope:
+          type: string
+          example: /events/123
+        email:
+          format: email
+          externalDocs:
+            url: 'https://schema.org/email'
+          type: string
+    RetrySubscribingError:
+      type: object
+      properties:
+        message:
+          readOnly: true
+          default: ''
+          type: string
+        code:
+          readOnly: true
+          default: 0
+          type: integer
+        file:
+          readOnly: true
+          default: ''
+          type: string
+        line:
+          readOnly: true
+          default: 0
+          type: integer
+        type:
+          readOnly: true
+          type: string
+        title:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        status:
+          readOnly: true
+          type:
+            - integer
+            - 'null'
+        detail:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        instance:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        trace:
+          readOnly: true
+          type: array
+          items:
+            type:
+              - string
+              - 'null'
+        previous:
+          anyOf:
+            -
+              $ref: '#/components/schemas/Throwable'
+            -
+              type: 'null'
+          readOnly: true
+        traceAsString:
+          readOnly: true
+          type: string
+    Throwable:
+      type: object
+      properties:
+        message:
+          readOnly: true
+          type: string
+        code:
+          readOnly: true
+        file:
+          readOnly: true
+          type: string
+        line:
+          readOnly: true
+          type: integer
+        trace:
+          readOnly: true
+          type: array
+          items:
+            type:
+              - string
+              - 'null'
+        previous:
+          anyOf:
+            -
+              $ref: '#/components/schemas/Throwable'
+            -
+              type: 'null'
+          readOnly: true
+        traceAsString:
+          readOnly: true
+          type: string
   responses: {  }
   parameters: {  }
   examples: {  }
@@ -342,8 +571,14 @@ security: []
 tags:
   -
     name: Event
-    description: 'Terminierte Veranstaltung'
+    description: 'API resource for planned events (e.g., concerts, meetings, etc.)'
   -
-    name: EventLocation
-    description: 'Event locations'
+    name: AlreadySubscribedError
+    description: "Resource 'AlreadySubscribedError' operations."
+  -
+    name: NotificationSubscription
+    description: 'Subscription for any type of notifications'
+  -
+    name: RetrySubscribingError
+    description: "Resource 'RetrySubscribingError' operations."
 webhooks: {  }

@@ -1,5 +1,9 @@
 # AGENTS
 
+## General
+
+Keep the coding style always consistant to existing tests in this project!
+
 ## Temporary Test Database Setup
 
 Integration tests can initialize a temporary schema with `SetupDatabaseTrait`.
@@ -16,7 +20,7 @@ final class ExampleTest extends KernelTestCase
 
     public function testSomething(): void
     {
-        $kernel = $this->bootKernel();
+        $kernel = static::bootKernel());
         $this->initDatabase($kernel);
 
         // Arrange / Act / Assert
@@ -30,29 +34,44 @@ final class ExampleTest extends KernelTestCase
 - Use this in integration tests that need real persistence behavior.
 - Keep test data isolated per test method.
 
-## Mocking With MockingTrait
+## Loading Fixtures in Tests
 
-`MockingTrait` provides a short helper for PHPUnit mocks in unit tests.
+Use `applyFixtures()` from `SetupDatabaseTrait` to load one or more Doctrine fixtures after schema setup.
 
 ### Minimal example
 
 ```php
-use Jazzfreunde\UnitTest\Trait\MockingTrait;
-use PHPUnit\Framework\TestCase;
+use Doctrine\Persistence\ObjectManager;
+use Jazzfreunde\UnitTest\Fixtures\CallbackFixture;
+use Jazzfreunde\UnitTest\Trait\SetupDatabaseTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class ExampleUnitTest extends TestCase
+final class ExampleFixtureTest extends KernelTestCase
 {
-    use MockingTrait;
+    use SetupDatabaseTrait;
 
-    public function testSomething(): void
+    public function testWithFixtures(): void
     {
-        $dependency = $this->mock(SomeDependency::class);
-        $dependency->expects($this->once())->method('run');
+        $kernel = static::bootKernel();
+        $this->initDatabase($kernel);
 
-        $dependency->run();
+        $this->applyFixtures(
+            $kernel,
+            new CallbackFixture(callback: function (ObjectManager $manager): void {
+                // persist test entities here
+                $manager->flush();
+            })
+        );
+
+        // Assert
     }
 }
 ```
+
+### Notes
+
+- `applyFixtures()` purges current data before loading passed fixtures.
+- Pass fixtures in execution order as variadic arguments.
 
 ### Notes
 

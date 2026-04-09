@@ -21,6 +21,18 @@ final class HexToken implements PrimitiveTypeInterface
     /**
      * @inheritDoc
      */
+    public static function from(mixed $value): static
+    {
+        if (!is_string($value)) {
+            throw new InvalidArgumentException('Value must be a string.');
+        }
+
+        return new self($value);
+    }
+
+    /**
+     * @inheritDoc
+     */
     #[Override]
     public static function tryFrom(mixed $value): static|null
     {

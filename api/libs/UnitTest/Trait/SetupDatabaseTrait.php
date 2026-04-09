@@ -2,6 +2,10 @@
 
 namespace Jazzfreunde\UnitTest\Trait;
 
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\FixtureInterface;
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -22,5 +26,24 @@ trait SetupDatabaseTrait
         $metaData = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($entityManager);
         $schemaTool->updateSchema($metaData);
+    }
+
+    /**
+    * Loads the given fixtures into the database.
+    *
+    * @param KernelInterface $kernel
+    * @param FixtureInterface ...$fixtures
+    * @return void
+    */
+    protected function applyFixtures(KernelInterface $kernel, FixtureInterface ...$fixtures): void
+    {
+        $loader = new Loader();
+        foreach ($fixtures as $fixture) {
+            $loader->addFixture($fixture);
+        }
+        
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $executor = new ORMExecutor($entityManager, new ORMPurger());
+        $executor->execute($loader->getFixtures());
     }
 }
