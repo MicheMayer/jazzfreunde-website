@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\VerificationCode;
 
@@ -10,24 +12,24 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Storage for tracking pending verification codes.
  * A verification code is a one-time code that is used to verify a user's identity.
+ *
  * @psalm-api
  */
 #[AsAlias]
 final class VerificationCodeStorage implements VerificationCodeStorageInterface
 {
     /**
-     * @param CacheItemPoolInterface $cache Cache pool for storing verification code usage counts.
-     * @param int $lifetime Lifetime of the cache items in seconds.
+     * @param CacheItemPoolInterface $cache    cache pool for storing verification code usage counts
+     * @param int                    $lifetime lifetime of the cache items in seconds
      */
     public function __construct(
         private CacheItemPoolInterface $cache,
         #[Autowire('%jazzfreunde.security.verification_code.token_lifetime%')]
         private int $lifetime,
-    ) {
-    }
+    ) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function store(string $hash, string $code): void
@@ -43,7 +45,7 @@ final class VerificationCodeStorage implements VerificationCodeStorageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function retrieve(string $hash): ?string
@@ -69,6 +71,7 @@ final class VerificationCodeStorage implements VerificationCodeStorageInterface
      * Transforms the hash into a URL-encoded key for storage.
      *
      * @param string $hash
+     *
      * @return string
      */
     private function getKey(string $hash): string

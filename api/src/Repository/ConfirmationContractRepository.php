@@ -6,23 +6,25 @@ namespace Jazzfreunde\App\Repository;
 
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
-use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingService;
+use Jazzfreunde\App\Service\Contract\ConfirmationContractPurgingInterface;
 use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 use RuntimeException;
-use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
 
 /**
  * Repository for managing {@see ConfirmationContract} entities.
+ *
  * @psalm-api
  */
-final class ConfirmationContractRepository extends ServiceEntityRepository implements ConfirmationContractPurgingService
+final class ConfirmationContractRepository extends ServiceEntityRepository implements ConfirmationContractPurgingInterface
 {
     /**
-     * Init repository
+     * Init repository.
      *
-     * @param  ManagerRegistry $registry
+     * @param ManagerRegistry $registry
+     *
      * @psalm-suppress PossiblyUnusedMethod
      * @psalm-suppress UnusedParam
      */
@@ -33,8 +35,6 @@ final class ConfirmationContractRepository extends ServiceEntityRepository imple
 
     /**
      * Purge vacant confirmation contracts.
-     *
-     * @return void
      */
     public function purgeVacantContracts(): void
     {

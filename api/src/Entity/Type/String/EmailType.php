@@ -1,22 +1,24 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Type\String;
 
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\StringType;
 use Jazzfreunde\App\Type\Primitive\Email;
 use Override;
 
 /**
- * email type
+ * email type.
  */
 final class EmailType extends StringType
 {
     public const ENTITY_NAME = 'email';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
@@ -27,7 +29,7 @@ final class EmailType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
@@ -41,7 +43,7 @@ final class EmailType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
@@ -58,7 +60,8 @@ final class EmailType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function requiresSQLCommentHint(AbstractPlatform $_): bool
@@ -67,7 +70,8 @@ final class EmailType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function getName(): string

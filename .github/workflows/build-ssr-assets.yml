@@ -3,17 +3,13 @@ on:
   workflow_call:
     inputs:
       artifact-name:
-        description: "Rerence name of the artifact produced"
-        required: true
-        type: string
-      environment:
-        description: "The environment in which to build the app"
+        description: "Reference name of the artifact produced"
         required: true
         type: string
 
 jobs:
   build:
-    name: Build frontend application
+    name: Build SSR assets
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,54 +17,38 @@ jobs:
         working-directory: ./api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: v18.x
-
-      - name: Restore cached npm dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: api/node_modules
-          key: node-api-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-dev --optimize-autoloader --no-scripts
+        uses: ./.github/actions/install-composer-dependencies
+        with:
+          installation-path: api
+          include-dev: "false"
 
       - name: Install npm dependencies
-        run: npm ci
-
-      - name: Cache npm dependencies
-        uses: actions/cache/save@v4
+        uses: ./.github/actions/install-npm-dependencies
         with:
-          path: api/node_modules
-          key: node-api-${{ hashFiles('**/package-lock.json') }}
+          installation-path: api
+          include-dev: "true"
 
       - name: Install assets
         run: |
           chmod +x bin/console
-          bin/console assets:install --env=${{ inputs.environment }} --no-debug
+          bin/console assets:install --env=prod --no-debug
 
       - name: Build Encore files
         run: |
-          npm run ${{ inputs.environment == 'prod' && 'app:build:prod' || 'app:build:dev'}}
-          npm run ${{ inputs.environment == 'prod' && 'mail:build:prod' || 'mail:build:dev'}}
+          npm run 'app:build:prod'
+          npm run 'mail:build:prod'
 
       - name: Generate sitemaps
         run: |
           chmod +x bin/console
-          bin/console presta:sitemap:dump --env=${{ inputs.environment }} --no-debug
+          bin/console presta:sitemap:dump --env=prod --no-debug
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.artifact-name }}
           path: api/public/

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Exception\Contract;
 
@@ -6,12 +8,12 @@ use Exception;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
 
 /**
- * The requested confirmation has expired
+ * The requested confirmation has expired.
  */
 final class ConfirmationPeriodExpiredException extends Exception
 {
     /**
-     * The requested confirmation has expired
+     * The requested confirmation has expired.
      *
      * @param ConfirmationContract $request requested confirmation
      */

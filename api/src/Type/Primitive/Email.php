@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Type\Primitive;
 
@@ -6,7 +8,7 @@ use InvalidArgumentException;
 use Override;
 
 /**
- * E-Mail Typ
+ * E-Mail Typ.
  */
 final class Email implements PrimitiveTypeInterface
 {
@@ -14,23 +16,6 @@ final class Email implements PrimitiveTypeInterface
      * @var non-empty-string
      */
     private readonly string $address;
-
-    /**
-     * @inheritDoc
-     */
-    #[Override]
-    public static function tryFrom(mixed $value): static|null
-    {
-        if (!is_string($value)) {
-            return null;
-        }
-        
-        try {
-            return new self($value);
-        } catch (InvalidArgumentException) {
-            return null;
-        }
-    }
 
     /**
      * @param string $value
@@ -45,7 +30,7 @@ final class Email implements PrimitiveTypeInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __toString(): string
     {
@@ -53,7 +38,37 @@ final class Email implements PrimitiveTypeInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     */
+    #[Override]
+    public static function from(mixed $value): static
+    {
+        if (!is_string($value)) {
+            throw new InvalidArgumentException('Value must be a string.');
+        }
+
+        return new self($value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    #[Override]
+    public static function tryFrom(mixed $value): ?static
+    {
+        if (!is_string($value)) {
+            return null;
+        }
+
+        try {
+            return new self($value);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     #[Override]
     public function value(): string

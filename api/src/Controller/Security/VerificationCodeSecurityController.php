@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Controller\Security;
 
@@ -19,14 +19,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 /**
  * Controller for handling login via verification code.
+ *
  * @psalm-suppress PropertyNotSetInConstructor $container
+ *
  * @psalm-api
  */
 #[Route('/verification', name: 'security_code_')]
@@ -35,22 +37,22 @@ final class VerificationCodeSecurityController extends AbstractController implem
     use LoggerAwareTrait;
 
     /**
-     * Dependency Injection
+     * Dependency Injection.
      *
      * @param Security $security
      */
     public function __construct(
         private Security $security,
-    ) {
-    }
+    ) {}
 
     /**
      * Send verification code to the user and render input form.
      *
      * @param Request $request
+     *
      * @return Response
      */
-    #[Route('/login', name: 'login', methods: [ Request::METHOD_GET ])]
+    #[Route('/login', name: 'login', methods: [Request::METHOD_GET])]
     public function showLoginForm(Request $request): Response
     {
         if ($this->security->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_FULLY)) {
@@ -68,13 +70,15 @@ final class VerificationCodeSecurityController extends AbstractController implem
     /**
      * Generates a new email with an authentication link and sends it to the user.
      *
-     * @param Request $request
+     * @param Request             $request
      * @param MessageBusInterface $bus
+     *
      * @return Response
+     *
      * @throws InvalidArgumentException if email is not valid
-     * @throws UserNotFoundException if user is not found
+     * @throws UserNotFoundException    if user is not found
      */
-    #[Route('/verification', name: 'verification', methods: [ Request::METHOD_POST ])]
+    #[Route('/verification', name: 'verification', methods: [Request::METHOD_POST])]
     public function showVerificationForm(
         Request $request,
         VerificationCodeHandler $verificationCodeHandler,
@@ -83,7 +87,7 @@ final class VerificationCodeSecurityController extends AbstractController implem
         if ($this->security->isGranted(AuthenticatedVoter::IS_AUTHENTICATED_FULLY)) {
             return RequestHelper::redirectToOrigin($request, $this->generateUrl('home'));
         }
-       
+
         try {
             $email = RequestHelper::getUserEmailFromPost($request);
 
@@ -92,6 +96,7 @@ final class VerificationCodeSecurityController extends AbstractController implem
             }
         } catch (InvalidArgumentException) {
             $this->addFlash('error', 'Die eingegebene E-Mail-Adresse ist ungültig.');
+
             return $this->redirect($this->generateUrl('security_code_login'));
         }
 
@@ -100,6 +105,7 @@ final class VerificationCodeSecurityController extends AbstractController implem
         if (is_null($email)) {
             $this->logger?->info('User email could not be determined from the request or session.');
             $this->addFlash('error', 'Diese Sitzung ist veraltet. Starten Sie den Anmeldevorgang bitte neu.');
+
             return $this->redirect($this->generateUrl('security_code_login'));
         }
         $verificationCode = $verificationCodeHandler->createVerificationCode($email->value());
@@ -109,9 +115,9 @@ final class VerificationCodeSecurityController extends AbstractController implem
             recipient: new Address($email->value()),
             subject: 'Authentifizierung bei Jazzfreunde Ingolstadt e.V.',
             twigTemplate: 'email/security/verification-code.html.twig',
-            twigContext: [ 'verification_code' => $verificationCode->digits ]
+            twigContext: ['verification_code' => $verificationCode->digits]
         ));
-        
+
         return $this->render('@pages/security/code/verification-form.html.twig', [
             'login_check' => 'security_code_login_check',
             '_expires' => $verificationCode->expiresAt->getTimestamp(),
@@ -124,7 +130,7 @@ final class VerificationCodeSecurityController extends AbstractController implem
      * Validate verification code and login user.
      */
     #[FirewallEntryPoint(firewallName: 'low_trust')]
-    #[Route('/auth', name: 'login_check', methods: [ Request::METHOD_POST ])]
+    #[Route('/auth', name: 'login_check', methods: [Request::METHOD_POST])]
     public function authenticate(): never
     {
         throw new LogicException('Login should be handled by the event subscriber. Check "Security" configuration!');

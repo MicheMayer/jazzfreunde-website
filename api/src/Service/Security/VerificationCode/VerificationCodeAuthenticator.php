@@ -23,6 +23,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 /**
  * Authenticator for handling digit code authentication.
+ *
  * @psalm-api
  */
 #[AsAlias(id: 'jazzfreunde.security.verification_code_authenticator')]
@@ -31,11 +32,12 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     private array $options;
 
     /**
-     * @param VerificationCodeHandlerInterface $verificationCodeHandler
-     * @param HttpUtils $httpUtils
+     * @param VerificationCodeHandlerInterface      $verificationCodeHandler
+     * @param HttpUtils                             $httpUtils
      * @param AuthenticationSuccessHandlerInterface $authenticationSuccessHandler
      * @param AuthenticationFailureHandlerInterface $authenticationFailureHandler
-     * @param array<array-key, string|int> $options Options for the authenticator.
+     * @param array<array-key, int|string>          $options                      options for the authenticator
+     *
      * @psalm-api
      */
     public function __construct(
@@ -52,7 +54,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function supports(Request $request): ?bool
@@ -62,7 +64,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function authenticate(Request $request): Passport
@@ -78,7 +80,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
         if (!$expires = $request->request->getInt('expires')) {
             throw new InvalidVerificationCodeAuthenticationException('Missing "expires" parameter.');
         }
-    
+
         if (!$code = $request->request->getString('code')) {
             throw new InvalidVerificationCodeAuthenticationException('Missing "code" parameter.');
         }
@@ -105,7 +107,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
@@ -114,7 +116,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
@@ -123,7 +125,7 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function isInteractive(): bool
@@ -135,7 +137,8 @@ final class VerificationCodeAuthenticator extends AbstractAuthenticator implemen
      * Returns the route to check for authentication.
      *
      * @return string
-     * @throws InvalidArgumentException If the check route is not set or invalid.
+     *
+     * @throws InvalidArgumentException if the check route is not set or invalid
      */
     private function getCheckRoute(): string
     {

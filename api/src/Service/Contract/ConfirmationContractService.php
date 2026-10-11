@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Contract;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
-use Jazzfreunde\App\Exception\Contract\ConfirmationContractNotFoundException;
 use Jazzfreunde\App\Event\MetaData\Workflow\ConfirmationContract\AwaitConfirmationContext;
+use Jazzfreunde\App\Exception\Contract\ConfirmationContractNotFoundException;
 use Jazzfreunde\App\Exception\Contract\ConfirmationPeriodExpiredException;
 use Jazzfreunde\App\Type\Primitive\Email;
 use Jazzfreunde\App\Workflow\ConfirmationContract\TransitionsEnum;
@@ -18,28 +20,28 @@ use function is_null;
 
 /**
  * Service for managing confirmation contracts.
+ *
  * @psalm-api
  */
 class ConfirmationContractService
 {
     /**
-     * @param WorkflowInterface $workflow
+     * @param WorkflowInterface      $workflow
      * @param EntityManagerInterface $entityManager
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function __construct(
         #[Target('confirmation_contract')]
         private WorkflowInterface $workflow,
         private EntityManagerInterface $entityManager,
-    ) {
-    }
+    ) {}
 
     /**
      * Start the confirmation process for a contract.
      *
      * @param ConfirmationContract $contract
-     * @param Email $email
-     * @return void
+     * @param Email                $email
      */
     public function startEmailConfirmation(
         ConfirmationContract $contract,
@@ -60,13 +62,20 @@ class ConfirmationContractService
      * This is used whenever the token expires before the contract is confirmed.
      *
      * @param ConfirmationContract $contract
-     * @param Email $email
-     * @return void
+     * @param Email                $email
      */
     public function restartEmailConfirmation(
         ConfirmationContract $contract,
         Email $email,
     ): void {
+        if (is_null($contract->uuid)) {
+            throw new LogicException('Cannot restart an unpersisted confirmation contract.');
+        }
+
+        if (!$this->workflow->can($contract, TransitionsEnum::Retry->value)) {
+            throw new ConfirmationPeriodExpiredException($contract);
+        }
+
         $this->transition(
             $contract,
             TransitionsEnum::Retry,
@@ -74,6 +83,10 @@ class ConfirmationContractService
                 Workflow::DISABLE_ANNOUNCE_EVENT => true,
             ]
         );
+
+        $contract = $this->entityManager->find(ConfirmationContract::class, $contract->uuid)
+            ?? throw new LogicException('Could not reload confirmation contract after retrying confirmation.');
+
         $this->transition(
             $contract,
             TransitionsEnum::AwaitConfirmation,
@@ -88,14 +101,14 @@ class ConfirmationContractService
      * Confirm the contract.
      *
      * @param string $token
-     * @return void
+     *
      * @throws ConfirmationPeriodExpiredException
      * @throws ConfirmationContractNotFoundException
      */
     public function confirmContract(string $token): void
     {
         $contract = $this->getContractByToken($token);
-        
+
         if (!$this->workflow->can($contract, TransitionsEnum::Confirm->value)) {
             throw new ConfirmationPeriodExpiredException($contract);
         }
@@ -111,13 +124,13 @@ class ConfirmationContractService
      * Cancel the contract.
      *
      * @param string $token
-     * @return void
+     *
      * @throws ConfirmationContractNotFoundException
      */
     public function cancelContract(string $token): void
     {
         $contract = $this->getContractByToken($token);
-        
+
         if (!$this->workflow->can($contract, TransitionsEnum::Cancel->value)) {
             return;
         }
@@ -133,9 +146,9 @@ class ConfirmationContractService
      * Transition the confirmation contract to the next state.
      *
      * @param ConfirmationContract $contract
-     * @param TransitionsEnum $transition
-     * @param array $context
-     * @return void
+     * @param TransitionsEnum      $transition
+     * @param array                $context
+     *
      * @throws LogicException if the transition is not valid
      */
     private function transition(
@@ -150,13 +163,15 @@ class ConfirmationContractService
      * Retrieve a confirmation contract by its token.
      *
      * @param string $token
+     *
      * @return ConfirmationContract
      */
     private function getContractByToken(string $token): ConfirmationContract
     {
+        /** @var null|ConfirmationContract $contract */
         $contract = $this->entityManager
-                         ->getRepository(ConfirmationContract::class)
-                         ->findOneBy(['token' => $token]);
+            ->getRepository(ConfirmationContract::class)
+            ->findOneBy(['token' => $token]);
 
         if (is_null($contract)) {
             throw new ConfirmationContractNotFoundException($token);

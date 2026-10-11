@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Event\MetaData\Workflow\ConfirmationContract;
 
@@ -25,11 +27,13 @@ final class PendingMetaData
 
     /**
      * @return DateInterval
+     *
      * @throws InvalidArgumentException
      */
     public function getTokenLifeTime(): DateInterval
     {
         $interval = DateInterval::createFromDateString($this->token_lifetime);
+
         return $interval ?: throw new InvalidArgumentException('Invalid token lifetime format');
     }
 }

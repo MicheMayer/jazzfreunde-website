@@ -1,22 +1,26 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\UnitTest;
 
 use InvalidArgumentException;
 use LogicException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Generator\Generator as MockGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use ReflectionNamedType;
+use stdClass;
 
-use function assert;
-use function is_null;
 use function array_key_exists;
 use function array_map;
+use function assert;
+use function is_null;
 
 /**
  * @template T of object
  * Unit under test to speed up mocking.
+ *
  * @psalm-suppress UnusedClass
  */
 final class UnitUnderTest
@@ -27,9 +31,14 @@ final class UnitUnderTest
     private array $mocks = [];
 
     /**
-     * @var array<string, mixed> $constants
+     * @var array<class-string, object>
      */
-    private array $constants = [];
+    private array $usedInstances = [];
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $configuredArguments = [];
 
     /**
      * @var class-string<T of object>
@@ -37,9 +46,9 @@ final class UnitUnderTest
     private string $class;
 
     /**
-     * @var T|null
+     * @var null|T
      */
-    private object|null $unitUnderTest = null;
+    private ?object $unitUnderTest = null;
 
     /**
      * Create a new unit under test.
@@ -73,28 +82,27 @@ final class UnitUnderTest
     /**
      * Configure a mocked dependency.
      *
-     * @template TMock
+     * @template TMock of object
+     *
      * @param class-string<TMock> $class
-     * @return TMock&MockObject
-     * @psalm-suppress InternalClass, InternalMethod
+     *
+     * @return MockObject&TMock
+     *
+     * @psalm-suppress InternalClass, InternalMethod, InvalidReturnType, InvalidReturnStatement
      */
     public function mock(string $class): object
     {
         if (array_key_exists($class, $this->mocks)) {
-            /**
-             * @var TMock&MockObject $mock
-             */
-            $mock = $this->mocks[$class];
-            return $mock;
+            // @var MockObject&TMock $mock
+            return $this->mocks[$class];
         }
 
-        $mock = (new MockGenerator)->testDouble(
+        /** @var MockObject&TMock $mock */
+        $mock = (new MockGenerator())->testDouble(
             $class,
-            true,
+            mockObject: true,
             callOriginalConstructor: false,
             callOriginalClone: false,
-            cloneArguments: false,
-            allowMockingUnknownTypes: false,
         );
 
         assert($mock instanceof $class);
@@ -106,24 +114,39 @@ final class UnitUnderTest
     }
 
     /**
-     * Configure a constant for the unit under test.
+     * Use a specific instance for a mocked dependency.
+     *
+     * @param class-string $class
+     * @param object       $instance
+     *
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function use(string $class, object $instance): void
+    {
+        $this->usedInstances[$class] = $instance;
+    }
+
+    /**
+     * Configure a constructor argument for the unit under test.
      *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function configure(string $name, mixed $value): void
     {
-        if (array_key_exists($name, $this->constants)) {
-            throw new LogicException("Constant '{$name}' is already configured.");
+        if (array_key_exists($name, $this->configuredArguments)) {
+            throw new LogicException("Constructor argument '{$name}' is already configured.");
         }
 
-        $this->constants[$name] = $value;
+        $this->configuredArguments[$name] = $value;
     }
 
     /**
      * Initialize the unit under test.
      *
-     * @throws InvalidArgumentException If the constructor parameters are not type-hinted.
+     * @throws InvalidArgumentException if the constructor parameters are not type-hinted
+     *
+     * @psalm-suppress MixedMethodCall
      */
     private function constructTarget(): void
     {
@@ -137,6 +160,10 @@ final class UnitUnderTest
             $args = $constructor->getParameters();
             $mocks = array_map(
                 function ($arg) use ($class) {
+                    if (array_key_exists($arg->name, $this->configuredArguments)) {
+                        return $this->configuredArguments[$arg->name];
+                    }
+
                     $type = $arg->getType();
                     if (is_null($type)) {
                         throw new InvalidArgumentException(
@@ -155,10 +182,6 @@ final class UnitUnderTest
                     }
 
                     if ($type->isBuiltin()) {
-                        if (!is_null($value = $this->getConfiguredConstant($arg->name))) {
-                            return $value;
-                        }
-
                         if ($arg->isDefaultValueAvailable()) {
                             return $arg->getDefaultValue();
                         }
@@ -167,38 +190,27 @@ final class UnitUnderTest
                     }
 
                     $className = $type->getName();
+
+                    if (array_key_exists($className, $this->usedInstances)) {
+                        return $this->usedInstances[$className];
+                    }
+
                     return $this->mock($className);
                 },
                 $args
             );
         }
-        
-        /**
-         * @psalm-suppress MixedMethodCall
-         */
+
         $this->unitUnderTest = new $class(...$mocks);
-    }
-
-    /**
-     * Get a configured constant or a mock of a built-in type.
-     *
-     * @param string $name
-     * @return mixed
-     */
-    private function getConfiguredConstant(string $name): mixed
-    {
-        if (!array_key_exists($name, $this->constants)) {
-            return null;
-        }
-
-        return $this->constants[$name];
     }
 
     /**
      * Mock a built-in type.
      *
      * @param ReflectionNamedType $type
+     *
      * @return mixed
+     *
      * @throws InvalidArgumentException
      */
     private function mockBuiltInType(ReflectionNamedType $type): mixed
@@ -213,8 +225,8 @@ final class UnitUnderTest
             'bool' => false,
             'float' => 0.0,
             'array' => [],
-            'object' => new \stdClass(),
-            'callable' => static fn() => null,
+            'object' => new stdClass(),
+            'callable' => static fn () => null,
             default => throw new InvalidArgumentException("Unsupported built-in type: '{$type}'"),
         };
     }

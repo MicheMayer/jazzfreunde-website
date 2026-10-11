@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Twig;
 
@@ -6,26 +8,26 @@ use Override;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Throwable;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Erweitert die Integration von Assets in Twig Templates
+ * Erweitert die Integration von Assets in Twig Templates.
+ *
  * @psalm-api
  */
 final class AssetExtension extends AbstractExtension
 {
     /**
-     * Dependency Injection
+     * Dependency Injection.
      *
      * @param string $publicDir
      */
-    public function __construct(private string $publicDir)
-    {
-    }
+    public function __construct(private string $publicDir) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getFunctions(): array
@@ -36,9 +38,10 @@ final class AssetExtension extends AbstractExtension
     }
 
     /**
-     * Gibt ein zufälliges Bild zurück
+     * Gibt ein zufälliges Bild zurück.
      *
      * @param string $directory Ablageort der Bilder
+     *
      * @return string URL zur Datei im Public-Verzeichnis
      */
     public function getRandomImage(string $directory): string
@@ -54,10 +57,10 @@ final class AssetExtension extends AbstractExtension
                 return '';
             }
 
-            $rndImage = fn(): SplFileInfo  => $images[random_int(0, $finder->count() - 1)] ?? throw new RuntimeException();
+            $rndImage = fn (): SplFileInfo => $images[random_int(0, $finder->count() - 1)] ?? throw new RuntimeException();
 
             return "{$lookup}/{$rndImage()->getRelativePathname()}";
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return '';
         }
     }

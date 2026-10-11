@@ -3,6 +3,7 @@
 namespace Jazzfreunde\App;
 
 use Jazzfreunde\App\DependencyInjection\Compiler\DoctrineTypeRegisterCompilerPass;
+use Jazzfreunde\App\DependencyInjection\Compiler\NotificationScopeRegisterCompilerPass;
 use Override;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,18 +12,18 @@ use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 use function dirname;
-use function sprintf;
 use function is_file;
+use function sprintf;
 
 /**
- * Symfony Main Kernel
+ * Symfony Main Kernel.
  */
 final class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getProjectDir(): string
@@ -31,16 +32,22 @@ final class Kernel extends BaseKernel
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     protected function build(ContainerBuilder $container): void
     {
         /** @var string */
         $projectDir = $container->getParameter('kernel.project_dir');
-        
+
         $container->addCompilerPass(
             new DoctrineTypeRegisterCompilerPass(
+                $projectDir
+            )
+        );
+
+        $container->addCompilerPass(
+            new NotificationScopeRegisterCompilerPass(
                 $projectDir
             )
         );
@@ -50,6 +57,7 @@ final class Kernel extends BaseKernel
      * Configures the container.
      *
      * @param ContainerConfigurator $container
+     *
      * @psalm-suppress UnusedMethod
      */
     private function configureContainer(ContainerConfigurator $container): void
@@ -67,6 +75,7 @@ final class Kernel extends BaseKernel
      * Adds or imports routes into your application.
      *
      * @param RoutingConfigurator $routes
+     *
      * @psalm-suppress UnusedMethod
      */
     private function configureRoutes(RoutingConfigurator $routes): void

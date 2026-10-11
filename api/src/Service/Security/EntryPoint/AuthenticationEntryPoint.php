@@ -1,9 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\EntryPoint;
 
 use Jazzfreunde\App\Service\Security\Request\RequestHelper;
 use Jazzfreunde\App\Service\Security\Request\SessionHelper;
+use LogicException;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
@@ -33,11 +36,10 @@ final class AuthenticationEntryPoint implements AuthenticationEntryPointInterfac
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private Security $security,
-    ) {
-    }
+    ) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function start(Request $request, ?AuthenticationException $authException = null): RedirectResponse
@@ -45,15 +47,15 @@ final class AuthenticationEntryPoint implements AuthenticationEntryPointInterfac
         $firewallName = $this->security->getFirewallConfig($request)?->getName();
 
         if (is_null($firewallName)) {
-            throw new \LogicException('Unable to load firewall for the request.');
+            throw new LogicException('Unable to load firewall for the request.');
         }
-        
+
         $entryPointRouteName = match ($firewallName) {
             'low_trust' => 'security_code_login',
             'main' => 'security_link_login',
-            default => throw new \LogicException("Unknown firewall name: '$firewallName'"),
+            default => throw new LogicException("Unknown firewall name: '{$firewallName}'"),
         };
-        
+
         $redirectUri = RequestHelper::getRedirectUri($request);
         SessionHelper::setRedirectUri($request->getSession(), $redirectUri);
 
