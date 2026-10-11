@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Validation\Attribute;
 
@@ -9,6 +11,7 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Attribute to validate a string as a Twig template.
+ *
  * @see https://symfony.com/doc/current/mailer.html#twig-html-css
  *
  * @psalm-api
@@ -19,13 +22,13 @@ final class TwigTemplate extends Constraint
     public string $message = 'The string "{{ string }}" is not a valid twig template path: it must have the .html.twig file extension.';
 
     /**
-     * @param string|null $message
-     * @param array<string, string>|null $groups
-     * @param mixed|null $payload
+     * @param null|string                $message
+     * @param null|array<string, string> $groups
+     * @param null|mixed                 $payload
      */
     public function __construct(?string $message = null, ?array $groups = null, $payload = null)
     {
-        parent::__construct([], $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
     }

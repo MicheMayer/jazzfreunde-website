@@ -12,23 +12,26 @@ jobs:
         working-directory: ./api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: api/vendor
-          key: tests-composer-${{ hashFiles('composer.lock') }}
-
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-scripts
+        uses: ./.github/actions/install-composer-dependencies
+        with:
+          installation-path: api
+          include-dev: "true"
+
+      - name: Install npm dependencies
+        uses: ./.github/actions/install-npm-dependencies
+        with:
+          installation-path: api
+          include-dev: "true"
+
+      - name: Build Encore files
+        run: |
+          npm run 'app:build:prod'
+          npm run 'mail:build:prod'
 
       - name: Configure matchers
         uses: mheap/phpunit-matcher-action@v1

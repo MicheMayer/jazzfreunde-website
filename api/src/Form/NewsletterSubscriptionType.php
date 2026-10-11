@@ -1,23 +1,26 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Form;
 
 use Override;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Formular für Newsletter Abonnement
+ * Formular für Newsletter Abonnement.
+ *
  * @extends AbstractType<array>
  */
 final class NewsletterSubscriptionType extends AbstractType
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -26,15 +29,15 @@ final class NewsletterSubscriptionType extends AbstractType
             ->setAction((string) ($options['action'] ?? ''))
             ->add('email', EmailType::class, [
                 'label' => 'Geben Sie Ihre Email-Adresse an',
-                 'required' => true,
-                 'constraints' => [new Assert\Email(message: 'The email {{ value }} is not a valid email.',)],
+                'required' => true,
+                'constraints' => [new Assert\Email(message: 'The email {{ value }} is not a valid email.')],
             ])
             ->add('subscribe', SubmitType::class, ['label' => 'Benachrichtige mich'])
             ->getForm();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void

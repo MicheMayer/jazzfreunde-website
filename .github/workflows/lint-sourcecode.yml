@@ -4,7 +4,8 @@ on:
   pull_request:
 
 jobs:
-  linting:
+  syntax-check:
+    name: Syntax Check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -12,25 +13,39 @@ jobs:
         working-directory: ./api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Install Composer dependencies
+        uses: ./.github/actions/install-composer-dependencies
         with:
-          php-version: 8.2
+          installation-path: api
+          include-dev: "true"
 
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
+      - name: "Run PHP Lint"
+        run: bin/php-cs-fixer check
+
+  static-code-analysis:
+    name: "Static Code Analysis"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./api
+
+    steps:
+      - uses: actions/checkout@v7
         with:
-          path: api/vendor
-          key: lint-composer-${{ hashFiles('composer.lock') }}
+          fetch-depth: 1
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-scripts
+        uses: ./.github/actions/install-composer-dependencies
+        with:
+          installation-path: api
+          include-dev: "true"
 
-      - name: Run static code analysis
+      - name: "Run Static Code Analysis"
         run: |
           mkdir var
           chmod +x bin/psalm

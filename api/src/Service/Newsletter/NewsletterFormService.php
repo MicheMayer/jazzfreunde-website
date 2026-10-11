@@ -10,25 +10,26 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Service zur Verwaltung des Newsletters
+ * Service zur Verwaltung des Newsletters.
+ *
  * @psalm-api
  */
 final class NewsletterFormService
 {
     /**
-     * @param FormFactoryInterface $formFactory
+     * @param FormFactoryInterface  $formFactory
      * @param UrlGeneratorInterface $urlGenerator
      */
     public function __construct(
         private FormFactoryInterface $formFactory,
         private UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+    ) {}
 
     /**
      * Generiert das Formular.
      *
      * @return FormInterface
+     *
      * @psalm-suppress PossiblyUnusedMethod used in Twig Template to render html form
      */
     public function createForm(): FormInterface
@@ -36,7 +37,7 @@ final class NewsletterFormService
         return $this->formFactory->create(
             NewsletterSubscriptionType::class,
             options: [
-                'action' => $this->urlGenerator->generate('form_newsletter_subscribe')
+                'action' => $this->urlGenerator->generate('form_newsletter_subscribe'),
             ]
         );
     }

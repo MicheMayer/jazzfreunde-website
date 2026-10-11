@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\VerificationCode;
 
@@ -11,16 +13,17 @@ interface VerificationCodeStorageInterface
     /**
      * Stores a verification code for a given hash.
      *
-     * @param string $hash The hash to associate with the verification code.
-     * @param string $code The verification code to store.
+     * @param string $hash the hash to associate with the verification code
+     * @param string $code the verification code to store
      */
     public function store(string $hash, string $code): void;
 
     /**
      * Retrieves and deletes a verification code for a given hash.
      *
-     * @param string $hash The hash associated with the verification code.
-     * @return string|null The verification code if found, null otherwise.
+     * @param string $hash the hash associated with the verification code
+     *
+     * @return null|string the verification code if found, null otherwise
      */
     public function retrieve(string $hash): ?string;
 }

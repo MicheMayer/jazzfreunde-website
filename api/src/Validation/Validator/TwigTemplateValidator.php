@@ -1,9 +1,12 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Validation\Validator;
 
 use Jazzfreunde\App\Validation\Attribute\TwigTemplate;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -14,10 +17,11 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  *
  * @psalm-api
  */
+#[AutoconfigureTag('validator.constraint_validator')]
 final class TwigTemplateValidator extends ConstraintValidator
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function validate(mixed $value, Constraint $constraint): void

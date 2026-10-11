@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\VerificationCode\Model;
 
@@ -12,7 +14,6 @@ final class VerificationCodeDetails
 {
     /**
      * The 6-digit numeric code used for verification.
-     *
      *
      * @var string
      */
@@ -28,20 +29,20 @@ final class VerificationCodeDetails
     /**
      * The expiration date and time of the verification code.
      *
-     *
      * @var DateTimeImmutable
      */
     public readonly DateTimeImmutable $expiresAt;
 
     /**
-     * @param string $digits
-     * @param string $signatureHash
+     * @param string            $digits
+     * @param string            $signatureHash
      * @param DateTimeImmutable $expiresAt
-     * @throws InvalidArgumentException If any of the parameters are invalid.
+     *
+     * @throws InvalidArgumentException if any of the parameters are invalid
      */
     public function __construct(string $digits, string $signatureHash, DateTimeImmutable $expiresAt)
     {
-        if (strlen($digits) !== 6 || !ctype_digit($digits)) {
+        if (6 !== strlen($digits) || !ctype_digit($digits)) {
             throw new InvalidArgumentException('The digit code must be a 6-digit numeric string.');
         }
         if (empty($signatureHash)) {

@@ -10,7 +10,7 @@
       },
       "extensions": [
         "bmewburn.vscode-intelephense-client",
-        "valeryanm.vscode-phpsab",
+        "junstyle.php-cs-fixer",
         "neilbrayfield.php-docblocker",
         "esbenp.prettier-vscode",
         "xdebug.php-debug",

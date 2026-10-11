@@ -1,7 +1,10 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\VerificationCode;
 
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Jazzfreunde\App\Service\Security\Exception\InvalidVerificationCodeException;
 use Jazzfreunde\App\Service\Security\Signature\SignatureHasherInterface;
@@ -30,15 +33,16 @@ use function str_pad;
 final class VerificationCodeHandler implements VerificationCodeHandlerInterface
 {
     /**
-     * @var array<array-key, string|int> Options for generating verification codes.
+     * @var array<array-key, int|string> options for generating verification codes
      */
     private array $options;
 
     /**
-     * @param SignatureHasherInterface $signatureHasher
-     * @param UserProviderInterface $userProvider
+     * @param SignatureHasherInterface         $signatureHasher
+     * @param UserProviderInterface            $userProvider
      * @param VerificationCodeStorageInterface $verificationCodeStorage
-     * @param array<array-key, string|int> $options
+     * @param array<array-key, int|string>     $options
+     *
      * @psalm-api
      */
     public function __construct(
@@ -54,14 +58,14 @@ final class VerificationCodeHandler implements VerificationCodeHandlerInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function createVerificationCode(
         string $userIdentifier
     ): VerificationCodeDetails {
         $expires = time() + $this->getTokenLifetime();
-        $expiresAt = new \DateTimeImmutable('@'.$expires);
+        $expiresAt = new DateTimeImmutable('@'.$expires);
 
         $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
         $hash = $this->signatureHasher->computeSignatureHash($user, $expires);
@@ -73,7 +77,7 @@ final class VerificationCodeHandler implements VerificationCodeHandlerInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function consumeVerificationCode(
@@ -84,16 +88,16 @@ final class VerificationCodeHandler implements VerificationCodeHandlerInterface
     ): UserInterface {
         try {
             $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
-            
+
             $storedCode = $this->verificationCodeStorage->retrieve($hash);
             $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
-            
+
             $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
 
             if (is_null($storedCode) || $storedCode !== $code) {
                 throw new InvalidVerificationCodeException('Invalid verification code.');
             }
-            
+
             return $user;
         } catch (UserNotFoundException $e) {
             throw new InvalidVerificationCodeException('User not found.', 0, $e);
@@ -113,12 +117,13 @@ final class VerificationCodeHandler implements VerificationCodeHandlerInterface
     {
         return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
-    
+
     /**
      * Validates the token lifetime option.
      *
      * @return int
-     * @throws InvalidArgumentException If the lifetime is not a positive integer.
+     *
+     * @throws InvalidArgumentException if the lifetime is not a positive integer
      */
     private function getTokenLifetime(): int
     {

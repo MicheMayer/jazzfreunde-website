@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\Request;
 
@@ -16,15 +18,16 @@ abstract class RequestHelper
      * Redirects the user back to the origin page.
      *
      * @param Request $request
-     * @param string $default
-     * @param string $anchor
+     * @param string  $default
+     * @param string  $anchor
+     *
      * @return RedirectResponse
      */
     public static function redirectToOrigin(Request $request, string $default, string $anchor = ''): RedirectResponse
     {
         $url = self::getRedirectUri($request, $default);
 
-        if ($anchor !== '') {
+        if ('' !== $anchor) {
             $url .= '#'.$anchor;
         }
 
@@ -35,8 +38,10 @@ abstract class RequestHelper
      * Get the user email from request.
      *
      * @param Request $request
-     * @return Email|null
-     * @throws InvalidArgumentException If the email is not valid.
+     *
+     * @return null|Email
+     *
+     * @throws InvalidArgumentException if the email is not valid
      */
     public static function getUserEmailFromPost(Request $request): ?Email
     {
@@ -60,6 +65,7 @@ abstract class RequestHelper
      *
      * @param Request $request
      * @param ?string $default
+     *
      * @return string
      */
     public static function getRedirectUri(Request $request, ?string $default = null): string

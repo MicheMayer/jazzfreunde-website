@@ -5,7 +5,8 @@ namespace Jazzfreunde\App\Entity\Security;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * User roles
+ * User roles.
+ *
  * @psalm-api
  */
 #[ORM\Entity]
@@ -13,18 +14,18 @@ use Doctrine\ORM\Mapping as ORM;
 class Role
 {
     /**
-     * Unique identifier in the database
+     * Unique identifier in the database.
      *
-     * @var string|null
+     * @var null|string
      */
-    #[ORM\Column(name: "uuid", type: "uuid", nullable: false)]
+    #[ORM\Column(name: 'uuid', type: 'uuid', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
-    #[ORM\CustomIdGenerator(class:"doctrine.uuid_generator")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     public ?string $uuid;
 
     /**
-     * Name of the role
+     * Name of the role.
      *
      * @var string
      */

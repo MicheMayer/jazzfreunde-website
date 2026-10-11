@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity;
 
@@ -11,11 +13,12 @@ use Jazzfreunde\App\Type\Primitive\Email;
 
 /**
  * Bekannte Emails werden vom System unter ihrem Handle referenziert und können so über die Datenbank konfiguriert werden.
+ *
  * @psalm-api
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'known_mails')]
-#[ORM\Index(fields: [ 'handle', 'address' ])]
+#[ORM\Index(fields: ['handle', 'address'])]
 class KnownMail
 {
     use PropertyInjectionTrait;

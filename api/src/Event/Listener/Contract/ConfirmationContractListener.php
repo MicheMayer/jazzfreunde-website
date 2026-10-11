@@ -1,7 +1,10 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Event\Listener\Contract;
 
+use DateTimeImmutable;
 use Doctrine\Persistence\ManagerRegistry;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
 use Jazzfreunde\App\Event\MetaData\Workflow\ConfirmationContract\AwaitConfirmationContext;
@@ -31,34 +34,34 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
  * @psalm-api
+ *
  * @psalm-suppress PropertyNotSetInConstructor
  */
 class ConfirmationContractListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const WORKFLOW_NAME = 'confirmation_contract';
+    public const string WORKFLOW_NAME = 'confirmation_contract';
 
     /**
-     * @param ManagerRegistry $registry
+     * @param ManagerRegistry     $registry
      * @param MessageBusInterface $bus
-     * @param ValidatorInterface $validator
-     * @param WorkflowInterface $confirmationContractStateMachine
+     * @param ValidatorInterface  $validator
+     * @param WorkflowInterface   $confirmationContractStateMachine
      */
     public function __construct(
         private ManagerRegistry $registry,
         private MessageBusInterface $bus,
         private ValidatorInterface $validator,
         private WorkflowInterface $confirmationContractStateMachine,
-    ) {
-    }
+    ) {}
 
     /**
      * Send confirmation request to user.
      *
      * @param TransitionEvent $event
-     * @return void
-     * @throws \LogicException if the subject is not a ConfirmationContract
+     *
+     * @throws LogicException if the subject is not a ConfirmationContract
      */
     #[AsTransitionListener(
         workflow: self::WORKFLOW_NAME,
@@ -68,16 +71,16 @@ class ConfirmationContractListener implements LoggerAwareInterface
     {
         $contract = $event->getSubject();
 
-        if (!($contract instanceof ConfirmationContract)) {
-            throw new \LogicException('Invalid subject type');
+        if (!$contract instanceof ConfirmationContract) {
+            throw new LogicException('Invalid subject type');
         }
 
         $transition = $event->getTransition();
 
         if (is_null($transition)) {
-            throw new \LogicException('Could not retrieve transition');
+            throw new LogicException('Could not retrieve transition');
         }
-        
+
         $context = AwaitConfirmationContext::fromMetaData(
             validator: $this->validator,
             data: $event->getContext(),
@@ -85,9 +88,9 @@ class ConfirmationContractListener implements LoggerAwareInterface
         $metaData = AwaitConfirmationMetaData::fromMetaData(
             validator: $this->validator,
             data: $this->confirmationContractStateMachine
-                        ->getDefinition()
-                        ->getMetadataStore()
-                        ->getTransitionMetadata($transition)
+                ->getDefinition()
+                ->getMetadataStore()
+                ->getTransitionMetadata($transition)
         );
 
         $this->bus->dispatch(new EmailNotification(
@@ -95,7 +98,7 @@ class ConfirmationContractListener implements LoggerAwareInterface
             recipient: new Address($context->email->__toString()),
             subject: $metaData->email_subject,
             twigTemplate: $metaData->email_template,
-            twigContext: [ 'token' => $contract->token ]
+            twigContext: ['token' => $contract->token]
         ));
     }
 
@@ -103,8 +106,8 @@ class ConfirmationContractListener implements LoggerAwareInterface
      * Block the transition if the confirmation token is expired.
      *
      * @param GuardEvent $event
-     * @return void
-     * @throws \LogicException if the subject is not a ConfirmationContract
+     *
+     * @throws LogicException if the subject is not a ConfirmationContract
      */
     #[AsGuardListener(
         workflow: self::WORKFLOW_NAME,
@@ -116,11 +119,11 @@ class ConfirmationContractListener implements LoggerAwareInterface
         $metaData = PendingMetaData::fromMetaData(
             validator: $this->validator,
             data: $this->confirmationContractStateMachine
-                        ->getDefinition()
-                        ->getMetadataStore()
-                        ->getPlaceMetadata(ConfirmationStateEnum::Pending->value)
+                ->getDefinition()
+                ->getMetadataStore()
+                ->getPlaceMetadata(ConfirmationStateEnum::Pending->value)
         );
-            
+
         if (!$contract->isExpired($metaData->getTokenLifeTime())) {
             return;
         }
@@ -132,8 +135,8 @@ class ConfirmationContractListener implements LoggerAwareInterface
      * Renew time and token of contract to restart the confirmation process on this contract.
      *
      * @param EnterEvent $event
-     * @return void
-     * @throws \LogicException if the subject is not a ConfirmationContract
+     *
+     * @throws LogicException if the subject is not a ConfirmationContract
      */
     #[AsEnterListener(
         workflow: self::WORKFLOW_NAME,
@@ -143,15 +146,15 @@ class ConfirmationContractListener implements LoggerAwareInterface
     {
         $contract = $this->getContract($event);
         $contract->token = new HexToken();
-        $contract->requestTime = new \DateTimeImmutable();
+        $contract->requestTime = new DateTimeImmutable();
     }
 
     /**
      * Log the state change of the contract.
      *
      * @param EnteredEvent $event
-     * @return void
-     * @throws \LogicException if the subject is not a ConfirmationContract
+     *
+     * @throws LogicException if the subject is not a ConfirmationContract
      */
     #[AsEnteredListener(
         workflow: self::WORKFLOW_NAME,
@@ -179,8 +182,10 @@ class ConfirmationContractListener implements LoggerAwareInterface
      * Get the contract from the event.
      *
      * @param Event $event
+     *
      * @return ConfirmationContract
-     * @throws \LogicException if the subject is not a ConfirmationContract
+     *
+     * @throws LogicException if the subject is not a ConfirmationContract
      */
     private function getContract(Event $event): ConfirmationContract
     {
@@ -188,7 +193,7 @@ class ConfirmationContractListener implements LoggerAwareInterface
         if ($subject instanceof ConfirmationContract) {
             return $subject;
         }
-        
-        throw new \LogicException(sprintf("Invalid subject type. Expected an instance of '%s'", ConfirmationContract::class));
+
+        throw new LogicException(sprintf("Invalid subject type. Expected an instance of '%s'", ConfirmationContract::class));
     }
 }

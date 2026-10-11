@@ -1,25 +1,26 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Controller;
 
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Routing Controller für die Website
+ * Routing Controller für die Website.
+ *
  * @psalm-api
  */
 final class AppRoutingController extends AbstractController
 {
     /**
-     * Startseite
+     * Startseite.
      *
      * @return Response
      */
@@ -32,7 +33,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Informationen zum Verein
+     * Informationen zum Verein.
      *
      * @return Response
      */
@@ -99,7 +100,7 @@ final class AppRoutingController extends AbstractController
                 Privat ist der gelernte Softwareentwickler gerne auf dem Rennrad unterwegs. Dann aber notgedrungen ohne Kontrabass.',
                 'pictureSrc' => 'app/images/people/michael.jpg',
                 'mail' => 'michael.mayer@jazzfreunde-ingolstadt.de',
-            ]
+            ],
         ];
 
         return $this->render(
@@ -111,7 +112,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Mitglied werden
+     * Mitglied werden.
      *
      * @return Response
      */
@@ -124,7 +125,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Datenschutzbestimmung
+     * Datenschutzbestimmung.
      *
      * @return Response
      */
@@ -137,7 +138,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Datenschutzbestimmung Social Media
+     * Datenschutzbestimmung Social Media.
      *
      * @return Response
      */
@@ -150,7 +151,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Datenschutzbestimmung
+     * Datenschutzbestimmung.
      *
      * @return Response
      */
@@ -163,7 +164,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Vereinssatzung
+     * Vereinssatzung.
      *
      * @return Response
      */
@@ -176,7 +177,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Veranstaltungen
+     * Veranstaltungen.
      *
      * @return Response
      */
@@ -189,7 +190,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Jazz and Literature
+     * Jazz and Literature.
      *
      * @return Response
      */
@@ -202,7 +203,7 @@ final class AppRoutingController extends AbstractController
     }
 
     /**
-     * Jam Sessions
+     * Jam Sessions.
      *
      * @return Response
      */
@@ -211,16 +212,17 @@ final class AppRoutingController extends AbstractController
     public function sessions(Security $security): Response
     {
         $isAuthenticated = $security->isGranted('IS_AUTHENTICATED_FULLY');
+
         return $this->render(
             '@pages/info/sessions.html.twig',
             [
-                'showCommunityLink' => $isAuthenticated
+                'showCommunityLink' => $isAuthenticated,
             ]
         );
     }
 
     /**
-     * Jam Sessions
+     * Jam Sessions.
      *
      * @return Response
      */
