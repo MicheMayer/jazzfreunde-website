@@ -64,7 +64,7 @@
             "label": "build encore",
             "type": "shell",
             "group": "build",
-            "command": "npm run app:build:prod && npm run mail:build:prod",
+            "command": "npm run app:build:dev && npm run mail:build:dev",
             "presentation": {
                 "clear": true,
                 "showReuseMessage": false
@@ -80,9 +80,12 @@
             "command": "bin/phpunit",
             "args": [
                 "--testdox",
-                "--teamcity",
-                "--testsuite=full",
-                "--display-notices"
+                "--testsuite=unit,integration,functional",
+                "--display-notices",
+                "--display-phpunit-notices",
+                "--display-deprecations",
+                "--display-phpunit-deprecations",
+                "--display-warnings"
             ],
             "options": {
                 "cwd": "${workspaceFolder}",
@@ -109,7 +112,27 @@
             }
         },
         {
-            "label": "Analyze code",
+            "label": "Profile Unit Tests",
+            "detail": "Run tests and write their durations to a JUnit report",
+            "type": "shell",
+            "group": "test",
+            "command": "bin/phpunit",
+            "args": [
+                "--testsuite=unit,integration,functional",
+                "--log-junit=var/log/junit.xml"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "XDEBUG_MODE": "off"
+                }
+            },
+            "presentation": {
+                "clear": true
+            }
+        },
+        {
+            "label": "Static Code Analysis",
             "type": "shell",
             "group": "test",
             "command": "bin/psalm",
@@ -141,6 +164,19 @@
                 "showReuseMessage": false,
                 "clear": true
             }
+        },
+        {
+            "label": "Check PHP Syntax",
+            "type": "shell",
+            "group": "build",
+            "command": "bin/php-cs-fixer",
+            "args": [
+                "check"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
         },
         {
             "label": "Generate api spec",

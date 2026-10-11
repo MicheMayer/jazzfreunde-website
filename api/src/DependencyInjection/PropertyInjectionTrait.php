@@ -1,8 +1,11 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\DependencyInjection;
 
 use BackedEnum;
+use Deprecated;
 use InvalidArgumentException;
 use Jazzfreunde\App\Type\Primitive\PrimitiveTypeInterface;
 use Jazzfreunde\Util\ArrayUtil;
@@ -14,29 +17,30 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use function array_filter;
+use function array_map;
+use function array_reduce;
+use function array_search;
 use function array_walk;
+use function call_user_func;
+use function class_exists;
 use function gettype;
+use function implode;
+use function is_a;
 use function is_int;
+use function is_null;
+use function is_object;
 use function is_string;
+use function is_subclass_of;
+use function key_exists;
+use function property_exists;
 use function str_contains;
 use function str_starts_with;
-use function class_exists;
 use function strtolower;
-use function array_reduce;
-use function key_exists;
-use function array_filter;
-use function implode;
-use function array_map;
-use function array_search;
-use function property_exists;
-use function is_object;
-use function is_null;
-use function is_subclass_of;
-use function call_user_func;
-use function is_a;
 
 /**
- * Trait zum schnellen Initialisieren von Objekten.
+ * Trait to inject properties into an object.
+ * As of the introduction of symfonies object mapper (https://symfony.com/doc/7.4/object_mapper.html) this trait is only used by Doctine ORM.
  */
 trait PropertyInjectionTrait
 {
@@ -46,11 +50,15 @@ trait PropertyInjectionTrait
     private array $setterDictionary = [];
 
     /**
-     * Property Injection
+     * Property Injection.
      *
      * @param mixed ...$params
+     *
      * @psalm-suppress UndefinedThisPropertyFetch
+     *
+     * @deprecated 2026-04-26 Use Symfony's Object Mapper instead
      */
+    #[Deprecated(message: 'use symfony object mapper instead', since: '2026.04.26')]
     public function __construct(mixed ...$params)
     {
         if (!ArrayUtil::isAssociativeArray($params)) {
@@ -61,26 +69,23 @@ trait PropertyInjectionTrait
     }
 
     /**
-     * Serialize the object without any of the traits own technical properties
+     * Serialize the object without any of the traits own technical properties.
      *
      * @return array
      */
     public function __serialize(): array
     {
-        $properties = array_filter(
+        return array_filter(
             get_object_vars($this),
-            fn($key) => 'setterDictionary' !== $key,
+            fn ($key) => 'setterDictionary' !== $key,
             ARRAY_FILTER_USE_KEY
         );
-
-        return $properties;
     }
 
     /**
-     * Unserialize the object
+     * Unserialize the object.
      *
      * @param array $data
-     * @return void
      */
     public function __unserialize(array $data): void
     {
@@ -88,74 +93,80 @@ trait PropertyInjectionTrait
     }
 
     /**
-     * Inject properties into the object
+     * Inject properties into the object.
      *
      * @param array $kvp associative array of [property name => value]
-     * @return void
      */
     protected function injectProperties(array $kvp): void
     {
-        if (count($kvp) === 0) {
+        if (0 === count($kvp)) {
             return;
         }
 
         $this->createSetterDictionary();
-        
-        array_walk($kvp, function (mixed $value, string|int $name) {
+
+        array_walk($kvp, function (mixed $value, int|string $name) {
             if (is_int($name)) {
-                throw new \LogicException("Cannot pass property without name.");
+                throw new LogicException('Cannot pass property without name.');
             }
             if (!property_exists($this, $name)) {
                 $className = static::class;
-                throw new \LogicException("Property {$name} does not exist in class {$className}.");
+
+                throw new LogicException("Property {$name} does not exist in class {$className}.");
             }
 
             $types = $this->getPropertyTypes($name);
 
-            $this
-                ->trySetNull($name, $types, $value)
-                ?->trySetEnum($name, $types, $value)
-                ?->trySetPrimitiveType($name, $types, $value)
-                ?->trySetBuiltInType($name, $types, $value)
-                ?->throwError($name, $types, $value);
+            if ($this->trySetNull($name, $types, $value)
+                || $this->trySetEnum($name, $types, $value)
+                || $this->trySetPrimitiveType($name, $types, $value)
+                || $this->trySetBuiltInType($name, $types, $value)
+            ) {
+                return;
+            }
+
+            $this->throwError($name, $types, $value);
         });
     }
 
     /**
-     * Try setting null
+     * Try setting null.
      *
-     * @param string $name
+     * @param string   $name
      * @param string[] $types
-     * @param mixed $value
-     * @return self|null return self to continue chaining, return null to stop chaining
+     * @param mixed    $value
+     *
+     * @return bool whether the value was accepted
      */
     private function trySetNull(
         string $name,
         array $types,
         mixed $value
-    ): self|null {
+    ): bool {
         if (is_null($value)
-        && array_search('null', $types) !== false) {
+        && false !== array_search('null', $types)) {
             $this->setValue($name, $value);
-            return null;
+
+            return true;
         }
 
-        return $this;
+        return false;
     }
 
     /**
-     * Try setting a built in type
+     * Try setting a built in type.
      *
-     * @param string $name
+     * @param string   $name
      * @param string[] $types
-     * @param mixed $value
-     * @return self|null return self to continue chaining, return null to stop chaining
+     * @param mixed    $value
+     *
+     * @return bool whether the value was accepted
      */
     private function trySetBuiltInType(
         string $name,
         array $types,
         mixed $value
-    ): self|null {
+    ): bool {
         $shortType = gettype($value);
         $typeName = match ($shortType) {
             'integer' => 'int',
@@ -167,7 +178,8 @@ trait PropertyInjectionTrait
         foreach ($types as $type) {
             if ($type === $typeName) {
                 $this->setValue($name, $value);
-                return null;
+
+                return true;
             }
 
             if (is_object($value)) {
@@ -177,8 +189,9 @@ trait PropertyInjectionTrait
                     $fullfillsIntersection = array_reduce(
                         $intersectionTypes,
                         /**
-                         * @param bool $carry do all types match
+                         * @param bool         $carry            do all types match
                          * @param class-string $intersectionType
+                         *
                          * @return bool
                          */
                         function (bool $carry, string $intersectionType) use ($value): bool {
@@ -186,7 +199,7 @@ trait PropertyInjectionTrait
                         },
                         true
                     );
-                    
+
                     if (!$fullfillsIntersection) {
                         continue;
                     }
@@ -196,38 +209,41 @@ trait PropertyInjectionTrait
                 }
 
                 $this->setValue($name, $value);
-                return null;
+
+                return true;
             }
         }
 
-        return $this;
+        return false;
     }
 
     /**
-     * Try setting an enum type
+     * Try setting an enum type.
      *
-     * @param string $name
+     * @param string   $name
      * @param string[] $types
-     * @param mixed $value
-     * @return self|null return self to continue chaining, return null to stop chaining
+     * @param mixed    $value
+     *
+     * @return bool whether the value was accepted
      */
     private function trySetEnum(
         string $name,
         array $types,
         mixed $value
-    ): self|null {
+    ): bool {
         foreach ($types as $type) {
             if (is_subclass_of($type, BackedEnum::class, true)) {
                 if (is_a($value, $type, true)) {
                     $this->setValue($name, $value);
-                    return null;
+
+                    return true;
                 }
 
                 if (!is_int($value) && !is_string($value)) {
                     continue;
                 }
 
-                /** @var BackedEnum|null */
+                /** @var null|BackedEnum */
                 $enum = call_user_func([$type, 'tryFrom'], $value);
 
                 if (is_null($enum)) {
@@ -235,29 +251,31 @@ trait PropertyInjectionTrait
                 }
 
                 $this->setValue($name, $enum);
-                return null;
+
+                return true;
             }
         }
 
-        return $this;
+        return false;
     }
 
     /**
-     * Try setting a primitive type
+     * Try setting a primitive type.
      *
-     * @param string $name
+     * @param string   $name
      * @param string[] $types
-     * @param mixed $value
-     * @return self|null return self to continue chaining, return null to stop chaining
+     * @param mixed    $value
+     *
+     * @return bool whether the value was accepted
      */
     private function trySetPrimitiveType(
         string $name,
         array $types,
         mixed $value
-    ): self|null {
+    ): bool {
         foreach ($types as $type) {
             if (is_subclass_of($type, PrimitiveTypeInterface::class, true)) {
-                /** @var PrimitiveTypeInterface|null */
+                /** @var null|PrimitiveTypeInterface */
                 $primitive = call_user_func([$type, 'tryFrom'], $value);
 
                 if (is_null($primitive)) {
@@ -265,20 +283,21 @@ trait PropertyInjectionTrait
                 }
 
                 $this->setValue($name, $primitive);
-                return null;
+
+                return true;
             }
         }
 
-        return $this;
+        return false;
     }
 
     /**
-     * Throw a value error
+     * Throw a value error.
      *
-     * @param string $name
+     * @param string   $name
      * @param string[] $types
-     * @param mixed $value
-     * @return void Throws a ValueError if no type matched
+     * @param mixed    $value
+     *
      * @throws InvalidArgumentException if the value does not match the type
      */
     private function throwError(
@@ -293,18 +312,19 @@ trait PropertyInjectionTrait
     }
 
     /**
-     * Get the types of a propertyas string representation
+     * Get the types of a propertyas string representation.
      *
      * @param string $propertyName
+     *
      * @return string[]
      */
     private function getPropertyTypes(string $propertyName): array
     {
         $types = [];
-        
+
         $property = new ReflectionProperty(static::class, $propertyName);
         $propertyType = $property->getType();
-        
+
         if ($propertyType instanceof ReflectionNamedType) {
             $types[] = $propertyType->getName();
         }
@@ -313,6 +333,7 @@ trait PropertyInjectionTrait
             foreach ($propertyType->getTypes() as $type) {
                 if ($type instanceof ReflectionIntersectionType) {
                     $types[] = $this->getIntersectionType($type);
+
                     continue;
                 }
 
@@ -332,26 +353,26 @@ trait PropertyInjectionTrait
     }
 
     /**
-     * Get the type as string
+     * Get the type as string.
      *
      * @param ReflectionIntersectionType $type
+     *
      * @return string
      */
     private function getIntersectionType(ReflectionIntersectionType $type): string
     {
         return implode('&', array_map(
-            fn(ReflectionNamedType $t) => $t->getName(),
+            fn (ReflectionNamedType $t) => $t->getName(),
             $type->getTypes()
         ));
     }
 
     /**
      * Set a value to a property
-     * Prefers setter method if available
+     * Prefers setter method if available.
      *
      * @param string $propertyName
-     * @param mixed $value
-     * @return void
+     * @param mixed  $value
      */
     private function setValue(string $propertyName, mixed $value): void
     {
@@ -359,31 +380,31 @@ trait PropertyInjectionTrait
         if (key_exists($key, $this->setterDictionary)) {
             $setter = $this->setterDictionary[$key];
             $setter->invoke($this, $value);
+
             return;
         }
 
         if (property_exists($this, $propertyName)) {
-            $this->$propertyName = $value;
+            $this->{$propertyName} = $value;
+
             return;
         }
-        
-        throw new \LogicException(
+
+        throw new LogicException(
             sprintf("Property '%s' does not exist in class '%s'.", $propertyName, static::class)
         );
     }
 
     /**
-     * Create a dictionary of setter methods
-     *
-     * @return void
+     * Create a dictionary of setter methods.
      */
     private function createSetterDictionary(): void
     {
         $reflectionClass = new ReflectionClass(static::class);
         $setterMethods = array_filter(
             $reflectionClass->getMethods(),
-            fn($method) => str_starts_with(strtolower($method->getName()), 'set')
-                && $method->getName() !== 'setValue'
+            fn ($method) => str_starts_with(strtolower($method->getName()), 'set')
+                && 'setValue' !== $method->getName()
         );
 
         array_walk($setterMethods, function (ReflectionMethod $method) {

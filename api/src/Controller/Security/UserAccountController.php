@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Controller\Security;
 
@@ -10,12 +10,14 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Controller for user related requests.
+ *
  * @psalm-suppress PropertyNotSetInConstructor $container
+ *
  * @psalm-api
  */
 #[FirewallEntryPoint(firewallName: 'main')]
@@ -30,7 +32,7 @@ final class UserAccountController extends AbstractController implements LoggerAw
      *
      * @return Response
      */
-    #[Route('/profile', name: 'profile', methods: [ Request::METHOD_GET ])]
+    #[Route('/profile', name: 'profile', methods: [Request::METHOD_GET])]
     public function userProfile(): Response
     {
         return $this->render(

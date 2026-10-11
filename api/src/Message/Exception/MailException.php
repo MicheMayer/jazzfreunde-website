@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Jazzfreunde\App\Message\Exception;
 
+use Exception;
+
 /**
- * Any occured during email process
+ * Any occured during email process.
  */
-final class MailException extends \Exception
-{
-}
+final class MailException extends Exception {}

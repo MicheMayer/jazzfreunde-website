@@ -1,8 +1,9 @@
+import { useCallback, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { client } from '@services/jazzfreunde-api.service'
 import { authenticatedRequest, type ApiRequest } from '@api/utils/request.util'
 import type { Event } from '@models/events/events.model'
-import type { HTTPError } from 'ky'
+import { HTTPError } from 'ky'
 import type { EventCollection, Month } from '../models/events-collection.model'
 
 /**
@@ -34,6 +35,63 @@ export const useUpcommingEvents = () => {
     error,
     isLoading,
     events: data,
+  }
+}
+
+export const useEventNotificationSubscription = (eventId: number | null) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const reset = useCallback(() => {
+    setError(null)
+    setIsSubmitted(false)
+  }, [])
+
+  const submitSubscription = async (email: string): Promise<'subscribed' | 'already-subscribed' | null> => {
+    setError(null)
+
+    if (eventId == null) {
+      setError('Für diese Veranstaltung können derzeit keine Benachrichtigungen angefordert werden.')
+      return null
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const request = client({
+        fetcher: authenticatedRequest,
+        path: '/api/notifications',
+        method: 'post',
+      })
+
+      await request(undefined, {
+        json: {
+          resourceScope: `/events/${eventId}`,
+          email,
+        },
+      })
+      setIsSubmitted(true)
+      return 'subscribed'
+    } catch (requestError) {
+      if (requestError instanceof HTTPError && requestError.response.status === 409) {
+        setError('Für diese Veranstaltung besteht mit dieser E-Mail-Adresse bereits ein Abonnement.')
+        return 'already-subscribed'
+      } else {
+        setError('Die Anmeldung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.')
+        return null
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return {
+    error,
+    isSubmitted,
+    isSubmitting,
+    reset,
+    submitSubscription,
   }
 }
 

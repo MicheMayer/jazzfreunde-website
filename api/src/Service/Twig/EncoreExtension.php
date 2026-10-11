@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Twig;
 
+use InvalidArgumentException;
 use Override;
 use Pelago\Emogrifier\CssInliner;
 use Pelago\Emogrifier\HtmlProcessor\CssToAttributeConverter;
@@ -13,24 +16,32 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
+use function array_filter;
+use function array_map;
+use function array_reduce;
+use function implode;
+use function is_string;
+use function mb_convert_encoding;
+use function mb_detect_encoding;
+use function sprintf;
+
 /**
- * Erweitert die Integration von Encore in Twig Templates
+ * Erweitert die Integration von Encore in Twig Templates.
+ *
  * @psalm-api
  */
 final class EncoreExtension extends AbstractExtension
 {
     /**
-     * Dependency Injection
+     * Dependency Injection.
      *
      * @param EntrypointLookupInterface $lookup
-     * @param string $publicDir
+     * @param string                    $publicDir
      */
-    public function __construct(private EntrypointLookupInterface $lookup, private string $publicDir)
-    {
-    }
+    public function __construct(private EntrypointLookupInterface $lookup, private string $publicDir) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getFunctions(): array
@@ -41,7 +52,7 @@ final class EncoreExtension extends AbstractExtension
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getFilters(): array
@@ -52,15 +63,17 @@ final class EncoreExtension extends AbstractExtension
     }
 
     /**
-     * Gibt generierte Encore CSS-Datei zur Laufzeit
+     * Gibt generierte Encore CSS-Datei zur Laufzeit.
      *
      * @param string $entryName
+     *
      * @return string
-     * @throws \RuntimeException
+     *
+     * @throws RuntimeException
      */
     public function getEncoreEntryCssSource(string $entryName): string
     {
-        /**
+        /*
          * Since mails are processed in bulk, we need to reset the entrypoint lookup,
          * otherwise it won't render all mail.
          *
@@ -74,21 +87,31 @@ final class EncoreExtension extends AbstractExtension
 
         return array_reduce(
             $entryPoints,
-            fn(string $source, string $entryPoint) => $source.$this->readFile($this->publicDir.$entryPoint),
+            fn (string $source, string $entryPoint) => $source.$this->readFile($this->publicDir.$entryPoint),
             ''
         );
     }
 
     /**
-     * Converts CSS-styles into inline styles
+     * Converts CSS-styles into inline styles.
      *
      * @param string $html
      * @param string $css
+     *
      * @return string
      */
     public function inlineCss(string $html, string ...$css): string
     {
-        $mergedCss = implode("\n", $css);
+        if (empty($html)) {
+            throw new InvalidArgumentException('HTML cannot be empty.');
+        }
+
+        $mergedCss = $this->mergeCss($css);
+
+        if (0 === strlen($mergedCss)) {
+            throw new InvalidArgumentException('CSS cannot be empty.');
+        }
+
         $cssInliner = CssInliner::fromHtml($html)
             ->inlineCss($mergedCss);
 
@@ -101,14 +124,15 @@ final class EncoreExtension extends AbstractExtension
             ->evaluateVariables();
         $processor = CssToAttributeConverter::fromDomDocument($domDocument)
             ->convertCssToVisualAttributes();
-        
+
         return $processor->render();
     }
 
     /**
-     * Reads a file and returns its content
+     * Reads a file and returns its content.
      *
      * @param string $fullPath
+     *
      * @return string
      */
     private function readFile(string $fullPath): string
@@ -118,13 +142,13 @@ final class EncoreExtension extends AbstractExtension
         }
         $raw = file_get_contents($fullPath);
 
-        if ($raw === false) {
+        if (false === $raw) {
             throw new RuntimeException(sprintf('Unable to read file: "%s"', $fullPath));
         }
-        
+
         $encoding = mb_detect_encoding($raw, 'UTF-8, ISO-8859-1', true);
 
-        if ($encoding === "UTF-8") {
+        if ('UTF-8' === $encoding) {
             return $raw;
         }
 
@@ -135,5 +159,20 @@ final class EncoreExtension extends AbstractExtension
         }
 
         return $encoded;
+    }
+
+    /**
+     * Merges multiple CSS strings into one, removing empty lines.
+     *
+     * @param array<string> $css
+     *
+     * @return string
+     */
+    private function mergeCss(array $css): string
+    {
+        $lines = array_map(fn (string $line) => trim($line), $css);
+        $lines = array_filter($lines, fn (string $line) => 0 !== strlen($line));
+
+        return implode("\n", $lines);
     }
 }

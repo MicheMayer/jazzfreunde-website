@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity;
 
@@ -7,7 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Jazzfreunde\App\DependencyInjection\PropertyInjectionTrait;
 
 /**
- * Event locations
+ * Event locations.
+ *
  * @psalm-api
  */
 #[ORM\Entity]
@@ -21,10 +24,21 @@ class EventLocation
 {
     use PropertyInjectionTrait;
 
+    /**
+     * Unique identifier in the database.
+     *
+     * @var null|int
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     public ?int $id = null;
+
+    /**
+     * Name of the location.
+     *
+     * @var string
+     */
     #[ORM\Column(type: 'string')]
     #[API\ApiProperty(required: true)]
     public string $name;

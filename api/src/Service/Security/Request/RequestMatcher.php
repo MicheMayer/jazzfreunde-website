@@ -1,11 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\Request;
 
+use Closure;
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
 use Override;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
@@ -17,20 +21,21 @@ final class RequestMatcher implements RequestMatcherInterface
 {
     /**
      * @param ControllerResolverInterface $controllerResolver
-     * @param string $firewallName
+     * @param string                      $firewallName
      */
     public function __construct(
         private readonly ControllerResolverInterface $controllerResolver,
         private readonly string $firewallName,
-    ) {
-    }
+    ) {}
 
     /**
      * Factory method to create a new instance of RequestMatcher.
      *
      * @param ControllerResolverInterface $controllerResolver
-     * @param string $firewallName
+     * @param string                      $firewallName
+     *
      * @return self
+     *
      * @psalm-api
      */
     public static function create(
@@ -44,7 +49,7 @@ final class RequestMatcher implements RequestMatcherInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function matches(Request $request): bool
@@ -60,17 +65,20 @@ final class RequestMatcher implements RequestMatcherInterface
      * Determine the reflection class for the controller handling the request.
      *
      * @param Request $request
-     * @return ReflectionFunctionAbstract|null
+     *
+     * @return null|ReflectionFunctionAbstract
      */
     public function getControllerReflector(Request $request): ?ReflectionFunctionAbstract
     {
         $controller = $this->controllerResolver->getController($request);
         if (\is_array($controller) && method_exists(...$controller)) {
-            return new \ReflectionMethod(...$controller);
-        } elseif (\is_string($controller) && str_contains($controller, '::')) {
-            return new \ReflectionMethod(...explode('::', $controller, 2));
-        } elseif ($controller instanceof \Closure) {
-            return new \ReflectionFunction($controller);
+            return new ReflectionMethod(...$controller);
+        }
+        if (\is_string($controller) && str_contains($controller, '::')) {
+            return new ReflectionMethod(...explode('::', $controller, 2));
+        }
+        if ($controller instanceof Closure) {
+            return new ReflectionFunction($controller);
         }
 
         return null;
@@ -79,13 +87,14 @@ final class RequestMatcher implements RequestMatcherInterface
     /**
      * Get all FirewallEntryPoint attributes from class and method.
      *
-     * @param ReflectionFunctionAbstract|null $controllerReflector
+     * @param null|ReflectionFunctionAbstract $controllerReflector
+     *
      * @return FirewallEntryPoint[]
      */
     public function getAttributes(?ReflectionFunctionAbstract $controllerReflector): array
     {
         $class = null;
-        if ($controllerReflector instanceof \ReflectionMethod) {
+        if ($controllerReflector instanceof ReflectionMethod) {
             $class = $controllerReflector->getDeclaringClass();
         } elseif ($controllerReflector instanceof ReflectionFunction && $controllerReflector->isAnonymous()) {
             $class = $controllerReflector->getClosureCalledClass();
@@ -97,7 +106,7 @@ final class RequestMatcher implements RequestMatcherInterface
         );
 
         return array_map(
-            static fn($attribute) => $attribute->newInstance(),
+            static fn ($attribute) => $attribute->newInstance(),
             $attributes
         );
     }

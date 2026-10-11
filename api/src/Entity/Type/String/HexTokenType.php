@@ -1,22 +1,24 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Type\String;
 
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\StringType;
 use Jazzfreunde\App\Type\Primitive\HexToken;
 use Override;
 
 /**
- * hexadecimal token type
+ * hexadecimal token type.
  */
 final class HexTokenType extends StringType
 {
     public const ENTITY_NAME = 'hextoken';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
@@ -28,7 +30,7 @@ final class HexTokenType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
@@ -42,7 +44,7 @@ final class HexTokenType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
@@ -59,7 +61,8 @@ final class HexTokenType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function requiresSQLCommentHint(AbstractPlatform $_): bool
@@ -68,7 +71,8 @@ final class HexTokenType extends StringType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function getName(): string

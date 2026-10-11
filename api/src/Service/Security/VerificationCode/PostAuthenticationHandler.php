@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\VerificationCode;
 
@@ -17,32 +19,31 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-use function sprintf;
 use function get_debug_type;
+use function sprintf;
 
 /**
  * Default handler for authentication success and failure.
  * Redirects to a target URL based on request parameters or default settings.
+ *
  * @psalm-api
  */
 #[AsAlias(id: 'jazzfreunde.security.verification_code_post_authentication_handler')]
-final class PostAuthenticationHandler implements
-    AuthenticationSuccessHandlerInterface,
-    AuthenticationFailureHandlerInterface
+final class PostAuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
     /**
-     * @param HttpUtils $httpUtils
+     * @param HttpUtils             $httpUtils
      * @param UrlGeneratorInterface $urlGenerator
+     *
      * @psalm-api
      */
     public function __construct(
-        protected HttpUtils $httpUtils,
-        protected UrlGeneratorInterface $urlGenerator,
-    ) {
-    }
+        private HttpUtils $httpUtils,
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
@@ -56,7 +57,7 @@ final class PostAuthenticationHandler implements
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
@@ -70,11 +71,12 @@ final class PostAuthenticationHandler implements
         if (!$session instanceof FlashBagAwareSessionInterface) {
             throw new LogicException(sprintf('You cannot use the addFlash method because class "%s" doesn\'t implement "%s".', get_debug_type($session), FlashBagAwareSessionInterface::class));
         }
-        
+
         $url = $this->urlGenerator->generate(
             'security_code_verification',
         );
         $session->getFlashBag()->add('error', 'Der eingegebene Code ist ungültig. Sie erhalten eine neue Verifizierungsaufforderung per E-Mail.');
+
         return $this->httpUtils->createRedirectResponse($request, $url, 307);
     }
 }

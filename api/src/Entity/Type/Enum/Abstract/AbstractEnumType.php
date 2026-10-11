@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Type\Enum\Abstract;
 
@@ -8,7 +10,7 @@ use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use Jazzfreunde\App\Entity\Type\Enum\Abstract\InvalidEnumTypeNameError;
+use InvalidArgumentException;
 use Override;
 use ValueError;
 
@@ -21,22 +23,23 @@ abstract class AbstractEnumType extends Type
     /**
      * @var string
      */
-    public const ENTITY_NAME = 'undefined';
-    /**
-     * @var class-string|'undefined'
-     */
-    public const ENUM_CLASS_NAME = 'undefined';
+    public const string ENTITY_NAME = 'undefined';
 
     /**
-     * @inheritDoc
+     * @var 'undefined'|class-string
+     */
+    public const string ENUM_CLASS_NAME = 'undefined';
+
+    /**
+     * {@inheritDoc}
      */
     #[Override]
     public static function addType(string $name, string|Type $type): void
     {
-        if ($name === self::ENTITY_NAME) {
+        if (self::ENTITY_NAME === $name) {
             throw new EntityNameUndefinedError(static::class);
         }
-        if (static::ENUM_CLASS_NAME === self::ENUM_CLASS_NAME) {
+        if (self::ENUM_CLASS_NAME === static::ENUM_CLASS_NAME) {
             throw new EnumClassNameUndefinedError(static::class);
         }
         if (!is_subclass_of(static::ENUM_CLASS_NAME, BackedEnum::class)) {
@@ -47,7 +50,7 @@ abstract class AbstractEnumType extends Type
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
@@ -59,29 +62,31 @@ abstract class AbstractEnumType extends Type
         $cases = array_map(
             /**
              * @param TEnum $type
+             *
              * @return string
              */
-            fn(BackedEnum $type) => "'{$type->value}'",
+            fn (BackedEnum $type) => "'{$type->value}'",
             static::cases()
         );
 
         if ($platform instanceof MariaDBPlatform) {
-            return sprintf("ENUM(%s)", implode(", ", $cases));
+            return sprintf('ENUM(%s)', implode(', ', $cases));
         }
 
         if ($platform instanceof SQLitePlatform) {
             /**
              * @var string $columnName
              */
-            $columnName = $column['name'] ?? throw new \InvalidArgumentException('Column name is required.');
-            return sprintf("TEXT CHECK(%s IN (%s))", $columnName, implode(", ", $cases));
+            $columnName = $column['name'] ?? throw new InvalidArgumentException('Column name is required.');
+
+            return sprintf('TEXT CHECK(%s IN (%s))', $columnName, implode(', ', $cases));
         }
 
-        throw new \InvalidArgumentException(sprintf('Platform "%s" is not supported.', $platform::class));
+        throw new InvalidArgumentException(sprintf('Platform "%s" is not supported.', $platform::class));
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
@@ -98,7 +103,7 @@ abstract class AbstractEnumType extends Type
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): mixed
@@ -115,7 +120,8 @@ abstract class AbstractEnumType extends Type
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function requiresSQLCommentHint(AbstractPlatform $_): bool
@@ -124,20 +130,11 @@ abstract class AbstractEnumType extends Type
     }
 
     /**
-     * @return TEnum[]
-     */
-    private static function cases(): array
-    {
-        /** @var TEnum[] */
-        $cases = call_user_func([static::ENUM_CLASS_NAME, 'cases']);
-
-        return $cases;
-    }
-
-    /**
      * @param int|string $value
+     *
      * @return TEnum
-     * @throws \ValueError
+     *
+     * @throws ValueError
      */
     public static function from(int|string $value): BackedEnum
     {
@@ -149,13 +146,25 @@ abstract class AbstractEnumType extends Type
 
     /**
      * @param int|string $value
-     * @return TEnum|null
+     *
+     * @return null|TEnum
      */
     public static function tryFrom(int|string $value): ?BackedEnum
     {
-        /** @var TEnum|null */
+        /** @var null|TEnum */
         $enum = call_user_func([static::ENUM_CLASS_NAME, 'tryFrom'], $value);
-        
+
         return $enum;
+    }
+
+    /**
+     * @return TEnum[]
+     */
+    private static function cases(): array
+    {
+        /** @var TEnum[] */
+        $cases = call_user_func([static::ENUM_CLASS_NAME, 'cases']);
+
+        return $cases;
     }
 }

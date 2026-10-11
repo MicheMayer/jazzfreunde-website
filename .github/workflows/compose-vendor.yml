@@ -17,17 +17,17 @@ jobs:
         working-directory: ./api
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
 
       - name: Restore cached Composer dependencies
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: api/vendor
           key: composer-${{ hashFiles('**/composer.lock') }}
@@ -36,12 +36,12 @@ jobs:
         run: composer install --prefer-dist --no-dev --optimize-autoloader --no-scripts --no-interaction
 
       - name: Cache Composer dependencies
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: api/vendor
           key: composer-${{ hashFiles('**/composer.lock') }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.artifact-name }}
           path: api/vendor/

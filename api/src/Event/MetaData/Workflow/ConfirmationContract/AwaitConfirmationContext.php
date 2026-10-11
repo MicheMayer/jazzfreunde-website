@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Event\MetaData\Workflow\ConfirmationContract;
 
@@ -18,7 +20,7 @@ final class AwaitConfirmationContext
     use PropertyInjectionTrait;
     use FromMetaDataTrait;
 
-    const EMAIL = 'email';
+    public const EMAIL = 'email';
 
     /**
      * @param Email $email Email address of the user to notify
