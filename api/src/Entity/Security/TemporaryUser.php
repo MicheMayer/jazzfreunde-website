@@ -1,12 +1,13 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Security;
 
 use Jazzfreunde\App\DependencyInjection\PropertyInjectionTrait;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Jazzfreunde\App\Type\Primitive\Email;
-use Jazzfreunde\App\Type\Primitive\HexToken;
 use Override;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Temporary user account for one-time use
@@ -20,39 +21,36 @@ class TemporaryUser implements UserInterface
     use PropertyInjectionTrait;
 
     /**
-     * Email address of the user
+     * Email address of the user.
      *
      * @var Email
      */
     public Email $email;
 
     /**
-     * Assigned roles of the user
+     * Assigned roles of the user.
      *
      * @var Role[]
      */
     public array $roles;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getRoles(): array
     {
-        return array_map(static fn(Role $role): string
-        => $role->name, $this->roles);
+        return array_map(static fn (Role $role): string => $role->name, $this->roles);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getUserIdentifier(): string

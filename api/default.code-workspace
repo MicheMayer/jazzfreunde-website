@@ -9,7 +9,10 @@
 			"**/node_modules": true,
 			"**/vendor": true
 		},
-		"phpsab.snifferShowSources": true
+		"php-cs-fixer.executablePath": "${workspaceFolder}/bin/php-cs-fixer",
+		"php-cs-fixer.autoFixByBracket": true,
+		"php-cs-fixer.autoFixBySemicolon": true,
+        "php-cs-fixer.exclude": ["**/var", "**/vendor", "**/node_modules"],
 	},
 	"extensions": {
 		"recommendations": [

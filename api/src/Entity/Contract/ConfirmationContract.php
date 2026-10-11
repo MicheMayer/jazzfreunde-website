@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Contract;
 
@@ -8,33 +10,35 @@ use Doctrine\ORM\Mapping as ORM;
 use Jazzfreunde\App\DependencyInjection\PropertyInjectionTrait;
 use Jazzfreunde\App\Entity\Type\Enum\Contract\ConfirmationStateEnumType;
 use Jazzfreunde\App\Entity\Type\String\HexTokenType;
+use Jazzfreunde\App\Repository\ConfirmationContractRepository;
 use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 use Jazzfreunde\App\Type\Primitive\HexToken;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Confirmation contract authorized by a user
+ * Confirmation contract authorized by a user.
+ *
  * @psalm-api
  */
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ConfirmationContractRepository::class)]
 #[ORM\Table(name: 'confirmation_contracts')]
 class ConfirmationContract
 {
     use PropertyInjectionTrait;
 
     /**
-     * Unique identifier in the database
+     * Unique identifier in the database.
      *
-     * @var string|null
+     * @var null|string
      */
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
-    #[ORM\CustomIdGenerator(class:"doctrine.uuid_generator")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     #[ORM\Column(type: 'uuid')]
     public ?string $uuid = null;
 
     /**
-     * Unique token that acts as a public identifier on the API
+     * Unique token that acts as a public identifier on the API.
      *
      * @var HexToken
      */
@@ -43,7 +47,7 @@ class ConfirmationContract
     public HexToken $token;
 
     /**
-     * Time the confirmation request was created
+     * Time the confirmation request was created.
      *
      * @var DateTimeImmutable
      */
@@ -51,16 +55,18 @@ class ConfirmationContract
     public DateTimeImmutable $requestTime;
 
     /**
-     * State of the confirmation contract
+     * State of the confirmation contract.
      *
      * @var ConfirmationStateEnum
      */
-    #[ORM\Column(type: ConfirmationStateEnumType::ENTITY_NAME, options: [ 'default' => ConfirmationStateEnum::New ])]
+    #[ORM\Column(type: ConfirmationStateEnumType::ENTITY_NAME, options: ['default' => ConfirmationStateEnum::New])]
     public ConfirmationStateEnum $state = ConfirmationStateEnum::New;
 
     /**
-     * Create a new contract
+     * Create a new contract.
+     *
      * @param array<string, mixed> ...$params
+     *
      * @psalm-suppress UndefinedThisPropertyFetch
      */
     public function __construct(array ...$params)
@@ -73,7 +79,7 @@ class ConfirmationContract
     /**
      * Has the contract been confirmed?
      *
-     * @return boolean
+     * @return bool
      */
     public function isConfirmed(): bool
     {
@@ -83,7 +89,7 @@ class ConfirmationContract
     /**
      * Has the confirmation period expired?
      *
-     * @return boolean
+     * @return bool
      */
     public function isExpired(DateInterval $tokenLifeTime): bool
     {
@@ -93,9 +99,10 @@ class ConfirmationContract
     }
 
     /**
-     * Get the current place of the workflow
+     * Get the current place of the workflow.
      *
      * @return string
+     *
      * @see https://symfony.com/doc/current/workflow.html#creating-a-workflow
      */
     public function getState(): string
@@ -104,10 +111,10 @@ class ConfirmationContract
     }
 
     /**
-     * Set the current place of the workflow
+     * Set the current place of the workflow.
      *
      * @param enum-string $currentPlace
-     * @param array $_
+     * @param array       $_
      *
      * @see https://symfony.com/doc/current/workflow.html#creating-a-workflow
      */

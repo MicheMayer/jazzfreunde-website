@@ -29,31 +29,30 @@ jobs:
     uses: ./.github/workflows/build-ssr-assets.yml
     with:
       artifact-name: prod-app-artifact
-      environment: prod
 
   build-project:
-    name: build homepage-php
+    name: "Build homepage-php"
     runs-on: ubuntu-latest
     needs: [ run-tests, lint-sourcecode, build-vendor-libraries, build-app ]
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: 'recursive'
 
-      - name: Download Composer artifact
-        uses: actions/download-artifact@v4
+      - name: "Download Composer Artifact"
+        uses: actions/download-artifact@v8
         with:
           name: prod-vendor-artifact
           path: ${{ env.DEPLOYMENT_FOLDER }}/vendor
 
-      - name: Download Encore artifact
-        uses: actions/download-artifact@v4
+      - name: "Download Encore Artifact"
+        uses: actions/download-artifact@v8
         with:
           name: prod-app-artifact
           path: ${{ env.DEPLOYMENT_FOLDER }}/public
 
-      - name: Render templates
+      - name: "Render Templates (Master)"
         if: ${{ github.ref_name == 'master' }}
         uses: ionos-deploy-now/template-renderer-action@v2
         id: template-prod
@@ -62,7 +61,7 @@ jobs:
           output-directory: ${{ env.DEPLOYMENT_FOLDER }}
           intermediate-data-file: ${{ env.DEPLOYMENT_FOLDER }}/.template-renderer-data
 
-      - name: Render templates
+      - name: "Render Templates (Staging)"
         if: ${{ github.ref_name != 'master' }}
         uses: ionos-deploy-now/template-renderer-action@v2
         id: template-staging
@@ -71,7 +70,7 @@ jobs:
           output-directory: ${{ env.DEPLOYMENT_FOLDER }}
           intermediate-data-file: ${{ env.DEPLOYMENT_FOLDER }}/.template-renderer-data
 
-      - name: Store deployment content
+      - name: "Store Deployment Content"
         uses: ionos-deploy-now/artifact-action@v1
         with:
           api-key: ${{ secrets.IONOS_API_KEY }}

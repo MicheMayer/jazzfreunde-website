@@ -1,5 +1,9 @@
 # AGENTS
 
+## General
+
+Keep the coding style always consistant to existing tests in this project!
+
 ## Temporary Test Database Setup
 
 Integration tests can initialize a temporary schema with `SetupDatabaseTrait`.
@@ -16,7 +20,7 @@ final class ExampleTest extends KernelTestCase
 
     public function testSomething(): void
     {
-        $kernel = $this->bootKernel();
+        $kernel = static::bootKernel();
         $this->initDatabase($kernel);
 
         // Arrange / Act / Assert
@@ -30,38 +34,52 @@ final class ExampleTest extends KernelTestCase
 - Use this in integration tests that need real persistence behavior.
 - Keep test data isolated per test method.
 
-## Mocking With MockingTrait
+## Loading Fixtures in Tests
 
-`MockingTrait` provides a short helper for PHPUnit mocks in unit tests.
+Use `applyFixtures()` from `SetupDatabaseTrait` to load one or more Doctrine fixtures after schema setup.
 
 ### Minimal example
 
 ```php
-use Jazzfreunde\UnitTest\Trait\MockingTrait;
-use PHPUnit\Framework\TestCase;
+use Doctrine\Persistence\ObjectManager;
+use Jazzfreunde\UnitTest\Fixtures\CallbackFixture;
+use Jazzfreunde\UnitTest\Trait\SetupDatabaseTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-final class ExampleUnitTest extends TestCase
+final class ExampleFixtureTest extends KernelTestCase
 {
-    use MockingTrait;
+    use SetupDatabaseTrait;
 
-    public function testSomething(): void
+    public function testWithFixtures(): void
     {
-        $dependency = $this->mock(SomeDependency::class);
-        $dependency->expects($this->once())->method('run');
+        $kernel = static::bootKernel();
+        $this->initDatabase($kernel);
 
-        $dependency->run();
+        $this->applyFixtures(
+            $kernel,
+            new CallbackFixture(callback: function (ObjectManager $manager): void {
+                // persist test entities here
+                $manager->flush();
+            })
+        );
+
+        // Assert
     }
 }
 ```
+### Available Fixtures
+
+- `KnownEmailsFixture`: Preloads a set of known email addresses for testing purposes.
+- `CallbackFixture`: Allows defining a callback to persist custom test entities.
 
 ### Notes
 
-- Use this for focused unit tests where dependencies should be mocked.
-- Prefer explicit expectations (`once`, `never`, `exactly`) for behavior checks.
+- `applyFixtures()` purges current data before loading passed fixtures.
+- Pass fixtures in execution order as variadic arguments.
 
 ## UnitUnderTest Helper
 
-`UnitUnderTest` auto-constructs the class under test and creates mocks for constructor dependencies.
+`UnitUnderTest` auto-constructs the class under test and creates mocks for constructor dependencies. This should be the prefered mocking approach in unit tests for this project.
 
 ### Example use case
 
@@ -95,3 +113,37 @@ final class ExampleHandlerTest extends TestCase
 - `target()` lazily constructs the class under test.
 - `mock(ClassName::class)` returns the same mock instance for repeated calls.
 - Use `configure('argumentName', value)` for built-in constructor parameters.
+
+## In-Memory Message Bus
+
+The in-memory message bus allows you to test message dispatching and handling without requiring a real message transport.
+Use in unit tests to mock message dispatching and handling.
+
+
+### Minimal example
+
+```php
+use Jazzfreunde\UnitTest\UnitUnderTest;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Jazzfreunde\UnitTest\ServiceMocks\InMemoryMessageBus;
+
+final class ExampleHandlerTest extends TestCase
+{
+    public function testHandle(): void
+    {
+        $uut = new UnitUnderTest(ExampleHandler::class);
+
+        $messageBus = new InMemoryMessageBus();
+        $uut->use(
+            MessageBusInterface::class,
+            $messageBus
+        );
+
+        $dispatchedMessages = $messageBus->getDispatchedMessages();
+        $this->assertCount(1, $dispatchedMessages);
+        $message = array_shift($dispatchedMessages);
+        $notification = $message->getMessage();
+    }
+}
+```

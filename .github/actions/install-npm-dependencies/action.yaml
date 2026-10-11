@@ -1,0 +1,33 @@
+name: "Install npm Dependencies"
+description: "Action to install npm dependencies and cache npm package downloads"
+
+inputs:
+  installation-path:
+    description: "The path where npm should be run"
+    required: true
+  include-dev:
+    description: "Whether to include dev dependencies"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Setup Node.js"
+      uses: actions/setup-node@v7
+      with:
+        node-version: 24.x
+        cache: npm
+        cache-dependency-path: ${{ inputs.installation-path }}/package-lock.json
+
+    - name: "Install npm dependencies (dev)"
+      shell: bash
+      working-directory: ${{ inputs.installation-path }}
+      if: ${{ inputs.include-dev == 'true' }}
+      run: npm ci
+
+    - name: "Install npm dependencies (no-dev)"
+      shell: bash
+      working-directory: ${{ inputs.installation-path }}
+      if: ${{ inputs.include-dev != 'true' }}
+      run: npm ci --omit=dev

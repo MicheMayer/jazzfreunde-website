@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\UnitTest\ServiceMocks;
 
@@ -11,6 +13,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
  *
  * This class is used to simulate the behavior of a message bus in a test environment.
  * It allows direct access to all dispatched messages.
+ *
  * @psalm-suppress UnusedClass
  */
 final class InMemoryMessageBus implements MessageBusInterface
@@ -21,7 +24,8 @@ final class InMemoryMessageBus implements MessageBusInterface
     private array $dispatchedMessages = [];
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress ArgumentTypeCoercion
      */

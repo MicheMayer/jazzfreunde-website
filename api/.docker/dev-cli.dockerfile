@@ -1,4 +1,5 @@
 ARG php_version="8.2"
+ARG node_version="24"
 
 FROM php:${php_version}-cli
 
@@ -52,9 +53,9 @@ RUN docker-php-ext-install opcache
 
 # Install Node and npm
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-RUN nvm install v22
-RUN nvm alias default v22
-RUN npm install -g npm@latest
+RUN nvm install v${node_version}
+RUN nvm alias default v${node_version}
+RUN npm install -g npm
 
 # xDebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug

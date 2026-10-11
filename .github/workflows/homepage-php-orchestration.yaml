@@ -18,7 +18,7 @@ on:
 
 jobs:
   retrieve-project:
-    name: check readiness
+    name: "Check Readiness"
     runs-on: ubuntu-latest
     if: github.repository == 'jazzfreunde-ingolstadt/homepage-php'
     outputs:
@@ -35,7 +35,7 @@ jobs:
           action: retrieve-info
 
   build:
-    name: build
+    name: "Build"
     needs: retrieve-project
     if: ${{ needs.retrieve-project.outputs.deployment-enabled == 'true' }}
     uses: ./.github/workflows/homepage-php-build.yaml
@@ -45,7 +45,7 @@ jobs:
     secrets: inherit
 
   deploy:
-    name: trigger deployment
+    name: "Trigger Deployment"
     needs:
       - retrieve-project
       - build

@@ -1,3 +1,6 @@
+parameters:
+    jazzfreunde.notification.scope_resources: []
+
 services:
     _defaults:
         autowire: true
@@ -32,3 +35,10 @@ services:
 
     Jazzfreunde\App\Schedule\:
         resource: '%kernel.project_dir%/src/Schedule/'
+
+    Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollectionProvider:
+        arguments:
+            $scopeResources: '%jazzfreunde.notification.scope_resources%'
+
+    Jazzfreunde\App\Validation\:
+        resource: '%kernel.project_dir%/src/Validation/'

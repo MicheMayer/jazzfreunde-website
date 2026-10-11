@@ -1,8 +1,13 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Schedule;
 
+use DateInterval;
 use Jazzfreunde\App\Message\Messages\Tasks\PurgeVacantConfirmationContractsMessage;
+use Jazzfreunde\App\Message\Messages\Tasks\SendEventNotificationsMessage;
+use Jazzfreunde\App\Message\Messages\Tasks\SendMonitoringReportMessage;
 use Override;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -23,18 +28,19 @@ final class DailyTasksProvider implements ScheduleProviderInterface
      */
     public function __construct(
         private CacheInterface $cache,
-    ) {
-    }
+    ) {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getSchedule(): Schedule
     {
         return (new Schedule())
             ->with(
-                RecurringMessage::cron('0 0 * * *', new PurgeVacantConfirmationContractsMessage())
+                RecurringMessage::cron('0 0 * * *', new PurgeVacantConfirmationContractsMessage()),
+                RecurringMessage::cron('0 0 * * *', new SendEventNotificationsMessage(upcomingIn: new DateInterval('P7D'))),
+                RecurringMessage::cron('0 0 * * *', new SendMonitoringReportMessage())
             )
             ->stateful($this->cache)
             ->processOnlyLastMissedRun(true);

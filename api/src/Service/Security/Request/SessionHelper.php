@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\Request;
 
@@ -16,7 +18,8 @@ abstract class SessionHelper
      * Get the redirect URI from the session.
      *
      * @param SessionInterface $session
-     * @return string|null
+     *
+     * @return null|string
      */
     public static function getRedirectUri(SessionInterface $session): ?string
     {
@@ -33,7 +36,7 @@ abstract class SessionHelper
      * Set the redirect URI in the session.
      *
      * @param SessionInterface $session
-     * @param string $uri
+     * @param string           $uri
      */
     public static function setRedirectUri(SessionInterface $session, string $uri): void
     {
@@ -54,6 +57,7 @@ abstract class SessionHelper
      * Get the user email from the session.
      *
      * @param SessionInterface $session
+     *
      * @return ?Email
      */
     public static function getUserEmail(SessionInterface $session): ?Email
@@ -71,7 +75,7 @@ abstract class SessionHelper
      * Set the user email in the session.
      *
      * @param SessionInterface $session
-     * @param Email $email
+     * @param Email            $email
      */
     public static function setUserEmail(SessionInterface $session, Email $email): void
     {

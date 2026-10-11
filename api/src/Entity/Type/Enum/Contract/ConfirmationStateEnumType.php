@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Type\Enum\Contract;
 
@@ -7,6 +9,7 @@ use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 
 /**
  * Enity type for the possible states of a confirmation.
+ *
  * @extends AbstractEnumType<ConfirmationStateEnum>
  */
 final class ConfirmationStateEnumType extends AbstractEnumType
@@ -14,9 +17,10 @@ final class ConfirmationStateEnumType extends AbstractEnumType
     /**
      * @override
      */
-    public const ENTITY_NAME = 'confirmation_state';
+    public const string ENTITY_NAME = 'confirmation_state';
+
     /**
      * @override
      */
-    public const ENUM_CLASS_NAME = ConfirmationStateEnum::class;
+    public const string ENUM_CLASS_NAME = ConfirmationStateEnum::class;
 }

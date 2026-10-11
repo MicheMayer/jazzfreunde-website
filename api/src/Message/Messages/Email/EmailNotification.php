@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Message\Messages\Email;
 
@@ -9,7 +11,8 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Validator\Constraints\Length;
 
 /**
- * Message for sending an email
+ * Message for sending an email.
+ *
  * @psalm-api
  */
 class EmailNotification
@@ -18,20 +21,21 @@ class EmailNotification
 
     /**
      * Email address of the sender
-     * Has to be a registered mailbox
+     * Has to be a registered mailbox.
      */
     public KnownMailHandleEnum $sender;
 
     /**
      * Email address of the recipient
-     * Can be a registered mailbox or a normal email address
+     * Can be a registered mailbox or a normal email address.
+     *
      * @see https://www.ionos.de/hilfe/e-mail/allgemeine-themen/wichtige-aenderung-fuer-das-versenden-von-e-mails-mit-abweichender-absenderadresse/
      */
-    public KnownMailHandleEnum|Address $recipient;
+    public Address|KnownMailHandleEnum $recipient;
 
     /**
      * Subject of the email
-     * Has to be at least 5 characters long
+     * Has to be at least 5 characters long.
      */
     #[Length(
         min: 5,
@@ -43,7 +47,8 @@ class EmailNotification
 
     /**
      * Template for the email
-     * Has to be a valid twig template
+     * Has to be a valid twig template.
+     *
      * @see https://symfony.com/doc/current/mailer.html#twig-html-css
      */
     #[TwigTemplate]
@@ -51,7 +56,8 @@ class EmailNotification
 
     /**
      * Context for the email
-     * Associative array of key-value pairs
+     * Associative array of key-value pairs.
+     *
      * @see https://symfony.com/doc/current/mailer.html#html-content
      */
     public array $twigContext = [];

@@ -1,25 +1,28 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Entity\Security;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Jazzfreunde\App\DependencyInjection\PropertyInjectionTrait;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Jazzfreunde\App\Entity\Type\String\EmailType;
 use Jazzfreunde\App\Entity\Type\String\HexTokenType;
 use Jazzfreunde\App\Type\Primitive\Email;
 use Jazzfreunde\App\Type\Primitive\HexToken;
 use Override;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * user account
+ * user account.
  *
  * ```sql
  *  # Befehl zum Anlegen eines neuen Nutzers
  *  INSERT INTO `users` (`uuid`, `email`, `token`)
  *      VALUES (UNHEX(REPLACE(UUID(), '-', '')), 'new.user@jazzfreunde-ingolstadt.localhost', SUBSTRING(MD5(CONCAT(uuid, request_time)), 1, 32))
  * ```
+ *
  * @psalm-api
  */
 #[ORM\Entity]
@@ -29,18 +32,18 @@ class User implements UserInterface
     use PropertyInjectionTrait;
 
     /**
-     * Unique identifier in the database
+     * Unique identifier in the database.
      *
-     * @var string|null
+     * @var null|string
      */
-    #[ORM\Column(name: "uuid", type: "uuid", nullable: false)]
+    #[ORM\Column(name: 'uuid', type: 'uuid', nullable: false)]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
-    #[ORM\CustomIdGenerator(class:"doctrine.uuid_generator")]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     public ?string $uuid;
 
     /**
-     * User secret to seed generated hashes
+     * User secret to seed generated hashes.
      *
      * @var HexToken
      */
@@ -48,7 +51,7 @@ class User implements UserInterface
     public HexToken $token;
 
     /**
-     * Email address of the user
+     * Email address of the user.
      *
      * @var Email
      */
@@ -56,7 +59,7 @@ class User implements UserInterface
     public Email $email;
 
     /**
-     * Assigned roles of the user
+     * Assigned roles of the user.
      *
      * @var Collection<array-key, Role>
      */
@@ -67,27 +70,24 @@ class User implements UserInterface
     public Collection $roles;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getRoles(): array
     {
         return $this->roles
-                    ->map(static fn(Role $role): string
-                    => $role->name)
-                    ->toArray();
+            ->map(static fn (Role $role): string => $role->name)
+            ->toArray();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function getUserIdentifier(): string

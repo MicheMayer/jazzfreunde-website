@@ -1,0 +1,86 @@
+# About this project
+
+## Getting Started
+
+> [!IMPORTANT]
+> If some PHP scripts cannot be executed due to missing permissions, reapply executable permissions to all executables in the `bin` directory.
+>
+> `root:/usr/project# chmod -R +x api/bin`
+
+### Install PHP Dependencies
+
+The VS Code task `composer install` is available to install the Composer dependencies.
+
+### Set Up the Database
+
+The database must be populated initially. This process consists of a base script followed by the database migrations.
+
+1. Import the base script:
+  Run the latest SQL export `.docker/database/export_*.sql`.
+  You can use the [phpMyAdmin](http://localhost:81) web interface, which is available as a local container.
+
+2. Run the migrations:
+  The VS Code task `Run Unit Tests` is available to run the database migrations.
+
+[siehe: Symfony - DoctrineMigrationsBundle](https://symfony.com/bundles/DoctrineMigrationsBundle/current/index.html)
+
+### Run Unit Tests
+
+To ensure the integrity of the backend, all important backend functionality is covered by unit tests \([see: PHPUnit](https://phpunit.de/index.html)\).
+
+The VS Code task `Run Unit Tests` is available to run the PHPUnit unit tests.
+
+### Build Frontend
+
+The frontend uses Symfony's [Twig](https://twig.symfony.com/) by default.
+[Webpack Encore](https://symfony.com/doc/current/frontend/encore/index.html) is used for client-side logic, allowing JavaScript-based components to be embedded in templates.
+Together with [Symfony UX](https://ux.symfony.com/) and [Symfony UX React](https://symfony.com/bundles/ux-react/current/index.html), this enables React components to be integrated as micro frontends.
+
+To compile the Encore components, run the VS Code task `build encore`.
+
+## Development Workflow
+
+### Symfony Console
+
+Many development tools are run through the Symfony Console component.
+See the [Symfony Console documentation](https://symfony.com/doc/current/console.html).
+Some of the most important Symfony Console commands are:
+
+Messenger [(Documentation)](https://symfony.com/doc/current/messenger.html#consuming-messages-running-the-worker)
+  Consume messages, for example, to send emails.
+  ```bash
+    bin/console messenger:consume async --time-limit=15
+  ```
+Doctrine Migrations [(Documentation)](https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html)
+  Run migrations.
+  ```bash
+      bin/console doctrine:migrations:migrate
+      bin/console doctrine:migrations:diff
+  ```
+
+### Local Development Server
+
+The website is available locally at [http://localhost/](http://localhost/).
+If the frontend has not yet been compiled, compile it before opening the site. This also applies to the email templates.
+Use the `npm run app:server` script to develop the interface.
+
+### Static Code Analysis
+
+To help ensure that the PHP code is free of errors, the project uses [Psalm](https://psalm.dev/).
+Run it using the VS Code task `Analyze code`.
+
+### Local Email Server
+
+All outgoing email is intercepted by a local SMTP server. You can inspect all email traffic at http://localhost:82.
+
+## API Documentation
+
+API Operations are handled through the [API Platfrom](https://api-platform.com/).
+
+### Swagger UI
+
+You can access the Swagger UI for the API at the following URL:
+
+```
+http://localhost/api/index.html
+```

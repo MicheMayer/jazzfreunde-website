@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Jazzfreunde\App\Service\Security\Signature;
 
 use DateTimeInterface;
 use InvalidArgumentException;
 use Override;
+use SensitiveParameter;
 use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -14,20 +17,21 @@ use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureExceptio
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use function base64_encode;
+use function get_debug_type;
+use function hash_equals;
 use function hash_final;
 use function hash_hmac;
 use function hash_init;
 use function hash_update;
 use function is_scalar;
+use function sprintf;
 use function strtr;
 use function substr;
 use function time;
-use function hash_equals;
-use function get_debug_type;
-use function sprintf;
 
 /**
- * Creates and validates secure hashes
+ * Creates and validates secure hashes.
+ *
  * @psalm-api
  */
 #[AsAlias(id: 'jazzfreunde.security.verification_code_signature_hasher')]
@@ -35,9 +39,11 @@ final class SignatureHasher implements SignatureHasherInterface
 {
     /**
      * @param PropertyAccessorInterface $propertyAccessor
-     * @param string[] $signatureProperties Properties of the User; the hash is invalidated if these properties change
-     * @param string $secret
+     * @param string[]                  $signatureProperties Properties of the User; the hash is invalidated if these properties change
+     * @param string                    $secret
+     *
      * @psalm-api
+     *
      * @throws InvalidArgumentException if the secret is empty
      */
     public function __construct(
@@ -45,7 +51,8 @@ final class SignatureHasher implements SignatureHasherInterface
         #[Autowire('%jazzfreunde.security.verification_code.signature_properties%')]
         private array $signatureProperties,
         #[Autowire('%kernel.secret%')]
-        #[\SensitiveParameter] private string $secret,
+        #[SensitiveParameter]
+        private string $secret,
     ) {
         if (!$secret) {
             throw new InvalidArgumentException('A non-empty secret is required.');
@@ -53,7 +60,7 @@ final class SignatureHasher implements SignatureHasherInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function acceptSignatureHash(string $userIdentifier, int $expires, string $hash): void
@@ -70,7 +77,7 @@ final class SignatureHasher implements SignatureHasherInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function verifySignatureHash(UserInterface $user, int $expires, string $hash): void
@@ -86,7 +93,7 @@ final class SignatureHasher implements SignatureHasherInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     #[Override]
     public function computeSignatureHash(UserInterface $user, int $expires): string
@@ -112,9 +119,10 @@ final class SignatureHasher implements SignatureHasherInterface
     }
 
     /**
-     * Generate a hash from token value
+     * Generate a hash from token value.
      *
      * @param string $tokenValue
+     *
      * @return string
      */
     private function generateHash(string $tokenValue): string

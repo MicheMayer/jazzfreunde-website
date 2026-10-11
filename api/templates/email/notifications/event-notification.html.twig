@@ -1,0 +1,28 @@
+{% extends 'email/base.html.twig' %}
+
+{% block content %}
+    <h1 class="text-xl">{{ event.title }}</h1>
+
+    {% if event.subtitle %}
+        <p>{{ event.subtitle }}</p>
+    {% endif %}
+
+    <p>
+        <strong>Datum:</strong>
+        {{ event.start|date('d.m.Y', 'Europe/Berlin') }}<br>
+        <strong>Uhrzeit:</strong>
+        {{ event.start|date('H:i', 'Europe/Berlin') }}{% if event.end is defined %} bis {{ event.end|date('H:i', 'Europe/Berlin') }}{% endif %} Uhr<br>
+        <strong>Ort:</strong>
+        {{ event.location }}
+    </p>
+
+    {% if event.link %}
+        <p>
+            <a href="{{ event.link }}">Weitere Informationen zur Veranstaltung</a>
+        </p>
+    {% endif %}
+
+    <p class="text-sm">
+        <a href="{{ url('notification_unsubscribe', { token: token }) }}">Benachrichtigungen zu dieser Veranstaltung abbestellen</a>
+    </p>
+{% endblock %}
