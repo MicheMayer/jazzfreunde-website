@@ -1,5 +1,5 @@
 ---
-name: create-pr-changelog
+name: create-changelog
 description: "Create a concise, non-technical, user-facing changelog for a release pull request from development to master. Use when preparing a release PR summary by reviewing all commits, changed files, and referenced GitHub issues."
 ---
 
