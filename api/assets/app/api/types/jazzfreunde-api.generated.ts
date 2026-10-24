@@ -256,7 +256,7 @@ export interface components {
             subtitle?: string | null;
             link?: string | null;
             /** @enum {string} */
-            category: "none" | "session" | "jazztage" | "jazz-and-literature";
+            category: "none" | "session" | "jazztage" | "jazz-and-literature" | "jazz-the-kiesch";
             notificationSource?: components["schemas"]["NotificationSource"] | null;
         };
         /** @description API resource for planned events (e.g., concerts, meetings, etc.). */
@@ -271,7 +271,7 @@ export interface components {
             subtitle?: string | null;
             link?: string | null;
             /** @enum {string} */
-            category: "none" | "session" | "jazztage" | "jazz-and-literature";
+            category: "none" | "session" | "jazztage" | "jazz-and-literature" | "jazz-the-kiesch";
             notificationSource?: components["schemas"]["NotificationSource.html"] | null;
         };
         EventLocation: {
