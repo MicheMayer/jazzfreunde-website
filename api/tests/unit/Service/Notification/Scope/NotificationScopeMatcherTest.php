@@ -10,6 +10,7 @@ use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollection;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollectionProviderInterface;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeMatcher;
 use Jazzfreunde\App\Service\Notification\Scope\Parameter\Number;
+use Jazzfreunde\App\Type\Primitive\Uri;
 use Jazzfreunde\UnitTest\UnitUnderTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -137,7 +138,7 @@ final class NotificationScopeMatcherTest extends TestCase
     private function createCollection(): NotificationScopeCollection
     {
         $collection = new NotificationScopeCollection();
-        $collection->add(new CompiledScope('~^/events/(?P<eventId>\d+)$~', [new Number('eventId')], stdClass::class));
+        $collection->add(new CompiledScope('~^/events/(?P<eventId>\d+)$~', [new Number('eventId')], stdClass::class, Uri::from('/events/{eventId:number}')));
 
         return $collection;
     }

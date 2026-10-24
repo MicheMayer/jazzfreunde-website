@@ -1,13 +1,14 @@
 import React, { useEffect, useId, useRef, useState } from 'react'
 import { MessageBox } from '@components/layout/message-box'
 import { useEventNotificationSubscription } from '@components/events/hooks/events-hooks'
+import type { Event } from '@models/events/events.model'
 
 interface EventNotificationSubscriptionProps {
     eventId: number | null
-    expirationTime: string | null
+    notificationSource: NonNullable<Event['notificationSource']> | null
     isOpen: boolean
     onClose: () => void
-    onSubscribed: (eventId: number) => void
+    onSubscribed: (notificationUri: string) => void
     notificationPrivacyUrl: string
 }
 
@@ -16,7 +17,7 @@ interface EventNotificationSubscriptionProps {
  */
 export const EventNotificationSubscription = ({
     eventId,
-    expirationTime,
+    notificationSource,
     isOpen,
     onClose,
     onSubscribed,
@@ -31,7 +32,7 @@ export const EventNotificationSubscription = ({
         isSubmitting,
         reset,
         submitSubscription,
-    } = useEventNotificationSubscription(eventId, expirationTime)
+    } = useEventNotificationSubscription(notificationSource)
 
     useEffect(() => {
         const dialog = dialogRef.current
@@ -47,13 +48,13 @@ export const EventNotificationSubscription = ({
         if (isOpen) {
             reset()
         }
-    }, [isOpen, eventId, reset])
+    }, [isOpen, eventId, notificationSource, reset])
 
     const handleSubmit = async (submitEvent: React.FormEvent<HTMLFormElement>) => {
         submitEvent.preventDefault()
         const result = await submitSubscription(email)
-        if (result !== null && eventId !== null) {
-            onSubscribed(eventId)
+        if (result !== null && notificationSource !== null) {
+            onSubscribed(notificationSource.resourceScope)
         }
     }
 

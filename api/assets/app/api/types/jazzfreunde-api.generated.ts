@@ -257,6 +257,7 @@ export interface components {
             link?: string | null;
             /** @enum {string} */
             category: "none" | "session" | "jazztage" | "jazz-and-literature";
+            notificationSource?: components["schemas"]["NotificationSource"] | null;
         };
         /** @description API resource for planned events (e.g., concerts, meetings, etc.). */
         "Event.html": {
@@ -271,6 +272,7 @@ export interface components {
             link?: string | null;
             /** @enum {string} */
             category: "none" | "session" | "jazztage" | "jazz-and-literature";
+            notificationSource?: components["schemas"]["NotificationSource.html"] | null;
         };
         EventLocation: {
             readonly id?: number;
@@ -303,6 +305,16 @@ export interface components {
              * @description Optional expiration time for this notification subscription.
              */
             expirationTime?: string | null;
+        };
+        NotificationSource: {
+            resourceScope: string;
+            /** Format: date-time */
+            expirationTime: string;
+        };
+        "NotificationSource.html": {
+            resourceScope: string;
+            /** Format: date-time */
+            expirationTime: string;
         };
         Throwable: {
             readonly message?: string;

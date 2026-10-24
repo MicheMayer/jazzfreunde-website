@@ -6,6 +6,7 @@ namespace JazzfreundeTests\App\Tests\Message\Handler\Tasks;
 
 use Jazzfreunde\App\Message\Handler\Tasks\MonitoringReportHandler;
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Jazzfreunde\UnitTest\UnitUnderTest;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,7 @@ final class MonitoringReportHandlerTest extends TestCase
                 $this->assertSame(KnownMailHandleEnum::NoReply, $email->sender);
                 $this->assertSame(KnownMailHandleEnum::Developers, $email->recipient);
                 $this->assertSame('Täglicher Monitoring-Bericht', $email->subject);
-                $this->assertSame('email/monitoring/daily-report.html.twig', $email->twigTemplate);
+                $this->assertSame(EmailTemplatePath::MONITORING_DAILY_REPORT, $email->twigTemplate);
 
                 return true;
             }))

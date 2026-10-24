@@ -7,6 +7,7 @@ namespace Jazzfreunde\App\Controller\Notification;
 use Jazzfreunde\App\Exception\Contract\ConfirmationContractNotFoundException;
 use Jazzfreunde\App\Exception\Contract\ConfirmationPeriodExpiredException;
 use Jazzfreunde\App\Service\Contract\ConfirmationContractService;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,6 +37,6 @@ final class NotificationConfirmationController extends AbstractController
             return new Response(status: Response::HTTP_NOT_FOUND);
         }
 
-        return $this->render('@pages/notifications/confirmation-notification.html.twig');
+        return $this->render(PageTemplatePath::NOTIFICATION_CONFIRMATION);
     }
 }

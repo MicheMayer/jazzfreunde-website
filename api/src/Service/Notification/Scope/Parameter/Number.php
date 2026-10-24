@@ -17,6 +17,12 @@ final class Number extends AbstractParameter
         return '\d+';
     }
 
+    #[Override]
+    public static function getType(): string
+    {
+        return 'number';
+    }
+
     /** @psalm-api */
     public static function parse(string $value): int
     {

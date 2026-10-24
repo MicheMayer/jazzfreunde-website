@@ -39,8 +39,7 @@ export const useUpcommingEvents = () => {
 }
 
 export const useEventNotificationSubscription = (
-  eventId: number | null,
-  expirationTime: string | null,
+  notificationSource: NonNullable<Event['notificationSource']> | null,
 ) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -54,7 +53,7 @@ export const useEventNotificationSubscription = (
   const submitSubscription = async (email: string): Promise<'subscribed' | 'already-subscribed' | null> => {
     setError(null)
 
-    if (eventId == null || expirationTime == null) {
+    if (notificationSource == null) {
       setError('Für diese Veranstaltung können derzeit keine Benachrichtigungen angefordert werden.')
       return null
     }
@@ -70,9 +69,9 @@ export const useEventNotificationSubscription = (
 
       await request(undefined, {
         json: {
-          resourceScope: `/events/${eventId}`,
+          resourceScope: notificationSource.resourceScope,
           email,
-          expirationTime,
+          expirationTime: notificationSource.expirationTime,
         },
       })
       setIsSubmitted(true)

@@ -82,6 +82,13 @@ final class NewsletterSubscriptionLifecycleTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Anmeldung bestätigt!');
         self::assertSame(ConfirmationStateEnum::Confirmed, $this->findSubscription()->confirmation->state);
+        self::assertEmailCount(1);
+
+        $newSubscriberNotice = self::getMailerMessage(0);
+        self::assertNotNull($newSubscriberNotice);
+        self::assertEmailSubjectContains($newSubscriberNotice, 'Neuer Newsletter Abonnent!');
+        self::assertEmailAddressContains($newSubscriberNotice, 'to', 'jazzletter@example.com');
+        self::assertEmailHtmlBodyContains($newSubscriberNotice, self::NEWSLETTER_EMAIL);
     }
 
     private function cancelNewsletterSubscription(string $token): void
@@ -91,6 +98,13 @@ final class NewsletterSubscriptionLifecycleTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Newsletter gekündigt!');
         self::assertSame(ConfirmationStateEnum::Cancelled, $this->findSubscription()->confirmation->state);
+        self::assertEmailCount(1);
+
+        $cancellationNotice = self::getMailerMessage(0);
+        self::assertNotNull($cancellationNotice);
+        self::assertEmailSubjectContains($cancellationNotice, 'Newsletter-Abmeldung');
+        self::assertEmailAddressContains($cancellationNotice, 'to', 'jazzletter@example.com');
+        self::assertEmailHtmlBodyContains($cancellationNotice, self::NEWSLETTER_EMAIL);
     }
 
     private function findSubscription(): NewsletterSubscription

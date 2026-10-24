@@ -120,6 +120,7 @@ final class NotificationProviderTest extends TestCase
                 '~^/events/(?P<id>\d+)$~',
                 [new Number('id')],
                 EventNotification::class,
+                Uri::from('/events/{id:number}'),
             ));
         }
 

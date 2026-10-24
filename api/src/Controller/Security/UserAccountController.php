@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jazzfreunde\App\Controller\Security;
 
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +37,7 @@ final class UserAccountController extends AbstractController implements LoggerAw
     public function userProfile(): Response
     {
         return $this->render(
-            '@pages/security/user/profile.html.twig'
+            PageTemplatePath::SECURITY_USER_PROFILE
         );
     }
 }

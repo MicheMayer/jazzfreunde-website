@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jazzfreunde\App\Controller;
 
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +29,7 @@ final class AppRoutingController extends AbstractController
     public function home(): Response
     {
         return $this->render(
-            '@pages/home.html.twig'
+            PageTemplatePath::HOME
         );
     }
 
@@ -104,7 +105,7 @@ final class AppRoutingController extends AbstractController
         ];
 
         return $this->render(
-            '@pages/about.html.twig',
+            PageTemplatePath::ABOUT,
             [
                 'personen' => $personen,
             ]
@@ -120,7 +121,7 @@ final class AppRoutingController extends AbstractController
     public function join(): Response
     {
         return $this->render(
-            '@pages/join.html.twig',
+            PageTemplatePath::JOIN,
         );
     }
 
@@ -133,7 +134,7 @@ final class AppRoutingController extends AbstractController
     public function endUserAgreement(): Response
     {
         return $this->render(
-            '@pages/legal/end-user-agreement.html.twig',
+            PageTemplatePath::LEGAL_END_USER_AGREEMENT,
         );
     }
 
@@ -146,7 +147,7 @@ final class AppRoutingController extends AbstractController
     public function endUserAgreementSocialMedia(): Response
     {
         return $this->render(
-            '@pages/legal/end-user-agreement-social-media.html.twig',
+            PageTemplatePath::LEGAL_END_USER_AGREEMENT_SOCIAL_MEDIA,
         );
     }
 
@@ -159,7 +160,7 @@ final class AppRoutingController extends AbstractController
     public function endUserAgreementNotifications(): Response
     {
         return $this->render(
-            '@pages/legal/end-user-agreement-notifications.html.twig',
+            PageTemplatePath::LEGAL_END_USER_AGREEMENT_NOTIFICATIONS,
         );
     }
 
@@ -172,7 +173,7 @@ final class AppRoutingController extends AbstractController
     public function impressum(): Response
     {
         return $this->render(
-            '@pages/legal/impressum.html.twig',
+            PageTemplatePath::LEGAL_IMPRESSUM,
         );
     }
 
@@ -185,7 +186,7 @@ final class AppRoutingController extends AbstractController
     public function statute(): Response
     {
         return $this->render(
-            '@pages/legal/satzung.html.twig',
+            PageTemplatePath::LEGAL_STATUTE,
         );
     }
 
@@ -198,7 +199,7 @@ final class AppRoutingController extends AbstractController
     public function events(): Response
     {
         return $this->render(
-            '@pages/events.html.twig'
+            PageTemplatePath::EVENTS
         );
     }
 
@@ -211,7 +212,7 @@ final class AppRoutingController extends AbstractController
     public function jazzAndLiterature(): Response
     {
         return $this->render(
-            '@pages/info/jazz-and-literature.html.twig'
+            PageTemplatePath::INFO_JAZZ_AND_LITERATURE
         );
     }
 
@@ -227,7 +228,7 @@ final class AppRoutingController extends AbstractController
         $isAuthenticated = $security->isGranted('IS_AUTHENTICATED_FULLY');
 
         return $this->render(
-            '@pages/info/sessions.html.twig',
+            PageTemplatePath::INFO_SESSIONS,
             [
                 'showCommunityLink' => $isAuthenticated,
             ]
@@ -245,7 +246,7 @@ final class AppRoutingController extends AbstractController
     public function sessionsCommunity(): Response
     {
         return $this->render(
-            '@pages/info/sessions-community.html.twig'
+            PageTemplatePath::INFO_SESSIONS_COMMUNITY
         );
     }
 }

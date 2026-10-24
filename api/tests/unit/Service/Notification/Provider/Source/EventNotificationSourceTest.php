@@ -13,6 +13,7 @@ use Jazzfreunde\App\Service\Event\EventRepositoryInterface;
 use Jazzfreunde\App\Service\Notification\Provider\Model\NotificationResource;
 use Jazzfreunde\App\Service\Notification\Provider\Source\EventNotificationSource;
 use Jazzfreunde\App\Service\Notification\Scope\ParsedScope;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Primitive\Uri;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -48,8 +49,8 @@ final class EventNotificationSourceTest extends TestCase
 
         self::assertInstanceOf(NotificationResource::class, $resource);
         self::assertSame('/events/42', $resource->uri->value());
-        self::assertSame('email/notifications/event-notification.html.twig', $resource->email_template);
-        self::assertSame('Jazz concert', $resource->title);
+        self::assertSame(EmailTemplatePath::EVENT_NOTIFICATION, $resource->email_template);
+        self::assertSame('Erinnerung: Jazz concert', $resource->title);
         self::assertSame([
             'event' => [
                 'title' => 'Jazz concert',

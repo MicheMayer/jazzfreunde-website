@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jazzfreunde\App\Controller;
 
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,7 +28,7 @@ final class LandingPageController extends AbstractController
     public function qr_code_overview(): Response
     {
         return $this->render(
-            '@pages/landing/overview.html.twig',
+            PageTemplatePath::LANDING_OVERVIEW,
             [
                 'landingPages' => [
                     [
@@ -54,7 +55,7 @@ final class LandingPageController extends AbstractController
     public function landingFlyer1(): Response
     {
         return $this->render(
-            '@pages/home.html.twig'
+            PageTemplatePath::HOME
         );
     }
 
@@ -81,7 +82,7 @@ final class LandingPageController extends AbstractController
     public function landingSocials(): Response
     {
         return $this->render(
-            '@pages/landing/socials.html.twig'
+            PageTemplatePath::LANDING_SOCIALS
         );
     }
 }

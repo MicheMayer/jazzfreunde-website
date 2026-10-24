@@ -10,6 +10,7 @@ use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
 use Jazzfreunde\App\Entity\NewsletterSubscription;
 use Jazzfreunde\App\Entity\Notification\NotificationSubscription;
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Jazzfreunde\App\Type\Primitive\Email;
 use LogicException;
@@ -25,8 +26,6 @@ final class ContractConfirmationRequestMailGenerator implements ContractConfirma
 {
     private const DEFAULT_SUBJECT = 'Bitte bestätigen Sie Ihre Anmeldung';
 
-    private const DEFAULT_TEMPLATE = 'email/contract/confirmation-request.html.twig';
-
     public function __construct(
         private readonly ManagerRegistry $registry,
     ) {}
@@ -38,13 +37,13 @@ final class ContractConfirmationRequestMailGenerator implements ContractConfirma
         [$subject, $template] = match (true) {
             $entity instanceof NewsletterSubscription => [
                 'Bestätigen Sie Ihre Newsletter Anmeldung',
-                'email/newsletter/confirmation-request.html.twig',
+                EmailTemplatePath::NEWSLETTER_CONFIRMATION_REQUEST,
             ],
             $entity instanceof NotificationSubscription => [
                 'Bitte bestätigen Sie Ihre Anmeldung für Benachrichtigungen',
-                'email/notifications/confirmation-request.html.twig',
+                EmailTemplatePath::NOTIFICATION_CONFIRMATION_REQUEST,
             ],
-            default => [self::DEFAULT_SUBJECT, self::DEFAULT_TEMPLATE],
+            default => [self::DEFAULT_SUBJECT, EmailTemplatePath::CONTRACT_CONFIRMATION_REQUEST],
         };
 
         return new EmailNotification(

@@ -10,6 +10,7 @@ use Jazzfreunde\App\Service\Event\EventRepositoryInterface;
 use Jazzfreunde\App\Service\Notification\Provider\Model\NotificationResource;
 use Jazzfreunde\App\Service\Notification\Provider\NotificationSourceInterface;
 use Jazzfreunde\App\Service\Notification\Scope\ParsedScope;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use LogicException;
 use Override;
 
@@ -55,8 +56,8 @@ final class EventNotificationSource implements NotificationSourceInterface
 
         return new NotificationResource(
             uri: $parsedScope->matchedScope,
-            email_template: 'email/notifications/event-notification.html.twig',
-            title: $event->title,
+            email_template: EmailTemplatePath::EVENT_NOTIFICATION,
+            title: sprintf('Erinnerung: %s', $event->title),
             metadata: [
                 'event' => $eventMetadata,
             ],

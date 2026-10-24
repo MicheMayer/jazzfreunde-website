@@ -9,6 +9,8 @@ export interface EventListProps {
      */
     events: Event[]
     notificationPrivacyUrl: string
+    subscribedNotificationUris: Set<string>
+    onSubscribed: (notificationUri: string) => void
 }
 
 /**
@@ -16,9 +18,13 @@ export interface EventListProps {
  * @param events The events to display
  * @returns A list of events
  */
-export default ({ events, notificationPrivacyUrl }: EventListProps) => {
+export default ({
+    events,
+    notificationPrivacyUrl,
+    subscribedNotificationUris,
+    onSubscribed,
+}: EventListProps) => {
     const [notificationEvent, setNotificationEvent] = useState<Event | null>(null)
-    const [subscribedEventIds, setSubscribedEventIds] = useState<Set<number>>(() => new Set())
 
     return (
         <div className="flex flex-col gap-10 w-full">
@@ -26,16 +32,16 @@ export default ({ events, notificationPrivacyUrl }: EventListProps) => {
                 <EventListItem
                     key={event.id}
                     event={event}
-                    isSubscribed={subscribedEventIds.has(event.id)}
+                    isSubscribed={event.notificationSource != null && subscribedNotificationUris.has(event.notificationSource.resourceScope)}
                     onNotify={setNotificationEvent}
                 />
             ))}
             <EventNotificationSubscription
                 eventId={notificationEvent?.id ?? null}
-                expirationTime={notificationEvent?.end ?? null}
+                notificationSource={notificationEvent?.notificationSource ?? null}
                 isOpen={notificationEvent !== null}
                 onClose={() => setNotificationEvent(null)}
-                onSubscribed={eventId => setSubscribedEventIds(ids => new Set(ids).add(eventId))}
+                onSubscribed={onSubscribed}
                 notificationPrivacyUrl={notificationPrivacyUrl}
             />
         </div>

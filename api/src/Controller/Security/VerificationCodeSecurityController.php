@@ -10,6 +10,8 @@ use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
 use Jazzfreunde\App\Service\Security\Request\RequestHelper;
 use Jazzfreunde\App\Service\Security\Request\SessionHelper;
 use Jazzfreunde\App\Service\Security\VerificationCode\VerificationCodeHandler;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -60,7 +62,7 @@ final class VerificationCodeSecurityController extends AbstractController implem
         }
 
         return $this->render(
-            '@pages/security/code/login-form.html.twig',
+            PageTemplatePath::SECURITY_CODE_LOGIN_FORM,
             [
                 'new_login_route' => 'security_code_verification',
             ]
@@ -114,11 +116,11 @@ final class VerificationCodeSecurityController extends AbstractController implem
             sender: KnownMailHandleEnum::NoReply,
             recipient: new Address($email->value()),
             subject: 'Authentifizierung bei Jazzfreunde Ingolstadt e.V.',
-            twigTemplate: 'email/security/verification-code.html.twig',
+            twigTemplate: EmailTemplatePath::SECURITY_VERIFICATION_CODE,
             twigContext: ['verification_code' => $verificationCode->digits]
         ));
 
-        return $this->render('@pages/security/code/verification-form.html.twig', [
+        return $this->render(PageTemplatePath::SECURITY_CODE_VERIFICATION_FORM, [
             'login_check' => 'security_code_login_check',
             '_expires' => $verificationCode->expiresAt->getTimestamp(),
             '_user' => $email,

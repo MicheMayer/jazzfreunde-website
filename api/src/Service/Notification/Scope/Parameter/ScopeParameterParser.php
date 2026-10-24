@@ -53,7 +53,7 @@ final class ScopeParameterParser
     private static function createParameterInstance(string $parameterType, string $parameterName): AbstractParameter
     {
         return match ($parameterType) {
-            'number' => new Number($parameterName),
+            Number::getType() => new Number($parameterName),
             default => throw new InvalidArgumentException('Unsupported parameter type: '.$parameterType),
         };
     }

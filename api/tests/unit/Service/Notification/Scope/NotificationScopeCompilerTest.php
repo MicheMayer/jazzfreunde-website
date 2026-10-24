@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Jazzfreunde\App\Service\Notification\Scope\Attribute\NotificationResource;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCompiler;
 use Jazzfreunde\App\Service\Notification\Scope\Parameter\Number;
+use Jazzfreunde\App\Type\Primitive\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -34,6 +35,7 @@ final class NotificationScopeCompilerTest extends TestCase
         self::assertSame('~^/events/archive\.v1$~', $compiled->getRegex());
         self::assertSame([], $compiled->getParameters());
         self::assertSame(stdClass::class, $compiled->getEntityClassName());
+        self::assertSame('/events/archive.v1', $compiled->getUri()->value());
     }
 
     /**
@@ -53,6 +55,8 @@ final class NotificationScopeCompilerTest extends TestCase
         self::assertInstanceOf(Number::class, $compiled->getParameters()[0]);
         self::assertSame('eventId', $compiled->getParameters()[0]->getName());
         self::assertSame(stdClass::class, $compiled->getEntityClassName());
+        self::assertSame('/events/{eventId:number}/items', $compiled->getUri()->value());
+        self::assertInstanceOf(Uri::class, $compiled->getUri());
     }
 
     /**
