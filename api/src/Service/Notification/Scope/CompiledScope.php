@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jazzfreunde\App\Service\Notification\Scope;
 
 use Jazzfreunde\App\Service\Notification\Scope\Parameter\AbstractParameter;
+use Jazzfreunde\App\Type\Primitive\Uri;
 
 /**
  * Represents a compiled notification scope.
@@ -15,11 +16,13 @@ final class CompiledScope
      * @param non-empty-string    $regex           the anchored, delimited regex pattern for the compiled scope
      * @param AbstractParameter[] $parameters      the parameters associated with the compiled scope
      * @param class-string        $entityClassName the class name of the entity associated with the compiled scope
+     * @param Uri                 $uri             the URI template for the compiled scope
      */
     public function __construct(
         public readonly string $regex,
         public readonly array $parameters,
-        public readonly string $entityClassName
+        public readonly string $entityClassName,
+        public readonly Uri $uri,
     ) {}
 
     /**
@@ -50,5 +53,15 @@ final class CompiledScope
     public function getEntityClassName(): string
     {
         return $this->entityClassName;
+    }
+
+    /**
+     * Gets the URI template for the compiled scope.
+     *
+     * @return Uri the URI template
+     */
+    public function getUri(): Uri
+    {
+        return $this->uri;
     }
 }

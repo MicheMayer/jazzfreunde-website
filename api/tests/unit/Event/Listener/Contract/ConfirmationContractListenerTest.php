@@ -12,6 +12,7 @@ use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
 use Jazzfreunde\App\Event\Listener\Contract\ConfirmationContractListener;
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
 use Jazzfreunde\App\Service\Contract\ContractConfirmationRequestMailGeneratorInterface;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Enum\Contract\ConfirmationStateEnum;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Jazzfreunde\App\Type\Primitive\Email;
@@ -54,7 +55,7 @@ final class ConfirmationContractListenerTest extends TestCase
             sender: KnownMailHandleEnum::NoReply,
             recipient: new Address('test@mail.com'),
             subject: 'Bitte bestätigen Sie Ihre Anmeldung',
-            twigTemplate: 'email/contract/confirmation-request.html.twig',
+            twigTemplate: EmailTemplatePath::CONTRACT_CONFIRMATION_REQUEST,
             twigContext: ['token' => $contract->token],
         );
 

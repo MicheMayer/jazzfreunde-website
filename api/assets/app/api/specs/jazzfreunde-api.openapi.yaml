@@ -591,6 +591,12 @@ components:
             - session
             - jazztage
             - jazz-and-literature
+        notificationSource:
+          anyOf:
+            -
+              $ref: '#/components/schemas/NotificationSource'
+            -
+              type: 'null'
     Event.html:
       type: object
       description: 'API resource for planned events (e.g., concerts, meetings, etc.).'
@@ -629,6 +635,12 @@ components:
             - session
             - jazztage
             - jazz-and-literature
+        notificationSource:
+          anyOf:
+            -
+              $ref: '#/components/schemas/NotificationSource.html'
+            -
+              type: 'null'
     EventLocation:
       type: object
       properties:
@@ -690,6 +702,28 @@ components:
           type:
             - string
             - 'null'
+          format: date-time
+    NotificationSource:
+      type: object
+      required:
+        - resourceScope
+        - expirationTime
+      properties:
+        resourceScope:
+          type: string
+        expirationTime:
+          type: string
+          format: date-time
+    NotificationSource.html:
+      type: object
+      required:
+        - resourceScope
+        - expirationTime
+      properties:
+        resourceScope:
+          type: string
+        expirationTime:
+          type: string
           format: date-time
     Throwable:
       type: object

@@ -9,6 +9,7 @@ use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollection;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollectionProviderInterface;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeMatcher;
 use Jazzfreunde\App\Service\Notification\Scope\Parameter\Number;
+use Jazzfreunde\App\Type\Primitive\Uri;
 use Jazzfreunde\App\Validation\Attribute\NotificationScope;
 use Jazzfreunde\App\Validation\Validator\NotificationScopeValidator;
 use stdClass;
@@ -76,6 +77,7 @@ final class NotificationScopeValidatorTest extends ConstraintValidatorTestCase
             '~^/events/(?P<id>\d+)$~',
             [new Number('id')],
             stdClass::class,
+            Uri::from('/events/{id:number}'),
         ));
 
         $scopeProvider = $this->createStub(NotificationScopeCollectionProviderInterface::class);

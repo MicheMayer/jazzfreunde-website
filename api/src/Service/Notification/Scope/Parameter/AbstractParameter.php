@@ -29,4 +29,12 @@ abstract class AbstractParameter
      * @return string the regex pattern for the parameter
      */
     abstract public function getRegex(): string;
+
+    /**
+     * Gets the type of the parameter.
+     * This string represents the type of the parameter in a URL.
+     *
+     * @return string the type of the parameter
+     */
+    abstract public static function getType(): string;
 }

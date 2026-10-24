@@ -9,8 +9,10 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata as API;
 use DateTime;
+use Jazzfreunde\App\Api\Notification\NotificationSource;
 use Jazzfreunde\App\Entity\Event as EventEntity;
 use Jazzfreunde\App\Entity\EventLocation;
+use Jazzfreunde\App\Service\Api\Provider\EventProvider;
 use Jazzfreunde\App\Type\Enum\EventCategoryEnum;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
@@ -21,10 +23,11 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
  */
 #[API\ApiResource(
     shortName: 'Event',
+    provider: EventProvider::class,
     stateOptions: new Options(entityClass: EventEntity::class),
     operations: [
-        new API\Get(),
-        new API\GetCollection(),
+        new API\Get(map: false),
+        new API\GetCollection(map: false),
     ],
     order: ['start' => 'ASC'],
     paginationClientItemsPerPage: true
@@ -106,5 +109,13 @@ final class Event
          */
         #[API\ApiProperty(required: true)]
         public EventCategoryEnum $category = EventCategoryEnum::default,
+
+        /**
+         * Optional data required to subscribe to notifications for this event.
+         *
+         * @var null|NotificationSource
+         */
+        #[API\ApiProperty(description: 'Notification subscription data, when a subscription is available.')]
+        public ?NotificationSource $notificationSource = null,
     ) {}
 }

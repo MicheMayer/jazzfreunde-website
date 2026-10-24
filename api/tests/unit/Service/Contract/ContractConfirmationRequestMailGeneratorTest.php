@@ -9,6 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 use Jazzfreunde\App\Entity\Contract\ConfirmationContract;
 use Jazzfreunde\App\Entity\NewsletterSubscription;
 use Jazzfreunde\App\Service\Contract\ContractConfirmationRequestMailGenerator;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Primitive\Email;
 use Jazzfreunde\UnitTest\UnitUnderTest;
 use LogicException;
@@ -36,7 +37,7 @@ final class ContractConfirmationRequestMailGeneratorTest extends TestCase
         );
 
         self::assertSame('Bitte bestätigen Sie Ihre Anmeldung', $mail->subject);
-        self::assertSame('email/contract/confirmation-request.html.twig', $mail->twigTemplate);
+        self::assertSame(EmailTemplatePath::CONTRACT_CONFIRMATION_REQUEST, $mail->twigTemplate);
         self::assertSame(['token' => $contract->token], $mail->twigContext);
         self::assertInstanceOf(Address::class, $mail->recipient);
         self::assertSame('subscriber@example.test', $mail->recipient->getAddress());
@@ -68,7 +69,7 @@ final class ContractConfirmationRequestMailGeneratorTest extends TestCase
         );
 
         self::assertSame('Bestätigen Sie Ihre Newsletter Anmeldung', $mail->subject);
-        self::assertSame('email/newsletter/confirmation-request.html.twig', $mail->twigTemplate);
+        self::assertSame(EmailTemplatePath::NEWSLETTER_CONFIRMATION_REQUEST, $mail->twigTemplate);
         self::assertSame(['token' => $contract->token], $mail->twigContext);
         self::assertInstanceOf(Address::class, $mail->recipient);
     }

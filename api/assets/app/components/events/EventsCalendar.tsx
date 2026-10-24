@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import EventList from './partials/EventList'
 import { groupEventsByMonth, useUpcommingEvents } from '@components/events/hooks/events-hooks'
 import { MessageBox } from '@components/layout/message-box'
+import { loadSubscribedNotificationUris, saveSubscribedNotificationUris } from './storage/event-subscription-storage'
 
 export interface EventsCalendarProps {
     notificationPrivacyUrl: string
@@ -17,6 +18,11 @@ export const EventsCalendar = ({ notificationPrivacyUrl }: EventsCalendarProps) 
         isLoading,
         error,
     } = useUpcommingEvents()
+    const [subscribedNotificationUris, setSubscribedNotificationUris] = useState<Set<string>>(loadSubscribedNotificationUris)
+
+    useEffect(() => {
+        saveSubscribedNotificationUris(subscribedNotificationUris)
+    }, [subscribedNotificationUris])
 
     if (isLoading)
         return <div className="text-center">Suche nach Veranstaltungen...</div>
@@ -38,6 +44,8 @@ export const EventsCalendar = ({ notificationPrivacyUrl }: EventsCalendarProps) 
                     <EventList
                         events={eventCollection.events}
                         notificationPrivacyUrl={notificationPrivacyUrl}
+                        subscribedNotificationUris={subscribedNotificationUris}
+                        onSubscribed={notificationUri => setSubscribedNotificationUris(uris => new Set(uris).add(notificationUri))}
                     />
                 </div>
             ))}

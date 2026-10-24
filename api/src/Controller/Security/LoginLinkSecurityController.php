@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
 use Jazzfreunde\App\Service\Security\Attribute\FirewallEntryPoint;
 use Jazzfreunde\App\Service\Security\Request\RequestHelper;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -59,7 +61,7 @@ final class LoginLinkSecurityController extends AbstractController implements Lo
         }
 
         return $this->render(
-            '@pages/security/link/login-form.html.twig',
+            PageTemplatePath::SECURITY_LINK_LOGIN_FORM,
             [
                 'new_login_route' => 'security_link_new_login',
             ]
@@ -87,7 +89,7 @@ final class LoginLinkSecurityController extends AbstractController implements Lo
             throw new \LogicException('Logout should be handled by an event subscriber. Check your "Security" configuration!');
         }
 
-        return $this->render('@pages/security/link/login-confirmation.html.twig', [
+        return $this->render(PageTemplatePath::SECURITY_LINK_LOGIN_CONFIRMATION, [
             'login_check' => 'security_link_login_check',
             '_expires' => $request->query->get('expires', 'error'),
             '_user' => $request->query->get('user', 'error'),
@@ -148,7 +150,7 @@ final class LoginLinkSecurityController extends AbstractController implements Lo
             sender: KnownMailHandleEnum::NoReply,
             recipient: new Address($email->value()),
             subject: 'Login bei Jazzfreunde Ingolstadt e.V.',
-            twigTemplate: 'email/security/login-link.html.twig',
+            twigTemplate: EmailTemplatePath::SECURITY_LOGIN_LINK,
             twigContext: ['login_link' => $loginLink]
         ));
 
@@ -164,7 +166,7 @@ final class LoginLinkSecurityController extends AbstractController implements Lo
     public function sent(): Response
     {
         return $this->render(
-            '@pages/security/link/login-sent.html.twig',
+            PageTemplatePath::SECURITY_LINK_LOGIN_SENT,
         );
     }
 

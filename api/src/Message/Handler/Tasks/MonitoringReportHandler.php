@@ -6,6 +6,7 @@ namespace Jazzfreunde\App\Message\Handler\Tasks;
 
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
 use Jazzfreunde\App\Message\Messages\Tasks\SendMonitoringReportMessage;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -40,7 +41,7 @@ final class MonitoringReportHandler
             sender: KnownMailHandleEnum::NoReply,
             recipient: KnownMailHandleEnum::Developers,
             subject: 'Täglicher Monitoring-Bericht',
-            twigTemplate: 'email/monitoring/daily-report.html.twig',
+            twigTemplate: EmailTemplatePath::MONITORING_DAILY_REPORT,
             twigContext: ['environmentName' => $this->environmentName],
         ));
     }

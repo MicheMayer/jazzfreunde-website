@@ -27,17 +27,19 @@ export const EventListItem = ({ event, isSubscribed, onNotify }: EventListItemPr
                 <div className="text-lg lg:text-xl font-bold tracking-wider">{event.title.toLocaleUpperCase()}</div>
                 <div className="flex w-full flex-row items-center justify-start gap-2">
                     <CategoryBadge category={event.category} />
-                    <button
-                        type="button"
-                        className="ml-auto flex w-fit flex-none items-center gap-2 whitespace-nowrap bg-orange px-4 py-2 font-bold text-white hover:bg-yellow rounded focus:outline-none focus:shadow-outline"
-                        onClick={() => onNotify(event)}
-                    >
-                        <i
-                            className={`${isSubscribed ? 'fa-solid' : 'fa-regular'} fa-bookmark`}
-                            aria-hidden="true"
-                        ></i>
-                        Benachrichtige mich
-                    </button>
+                    {event.notificationSource && (
+                        <button
+                            type="button"
+                            className="ml-auto flex w-fit flex-none items-center gap-2 whitespace-nowrap bg-orange px-4 py-2 font-bold text-white hover:bg-yellow rounded focus:outline-none focus:shadow-outline"
+                            onClick={() => onNotify(event)}
+                        >
+                            <i
+                                className={`${isSubscribed ? 'fa-solid' : 'fa-regular'} fa-bookmark`}
+                                aria-hidden="true"
+                            ></i>
+                            Benachrichtige mich
+                        </button>
+                    )}
                 </div>
                 <div>{event.subtitle}</div>
                 {event.link && (<a href={event.link} target="_blank" rel="noopener noreferrer"><i className="fa-solid fa-link" aria-hidden="true"></i> Zur Webseite</a>)}

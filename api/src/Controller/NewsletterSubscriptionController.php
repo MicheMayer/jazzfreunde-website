@@ -13,6 +13,7 @@ use Jazzfreunde\App\Exception\Newsletter\SubscriptionException;
 use Jazzfreunde\App\Form\NewsletterSubscriptionType;
 use Jazzfreunde\App\Service\Newsletter\NewsletterService;
 use Jazzfreunde\App\Service\Security\Request\RequestHelper;
+use Jazzfreunde\App\Service\Twig\PageTemplatePath;
 use Jazzfreunde\App\Type\Primitive\Email;
 use LogicException;
 use Psr\Log\LoggerAwareInterface;
@@ -126,7 +127,7 @@ final class NewsletterSubscriptionController extends AbstractController implemen
     #[Route('/newsletter_subscription_received/', name: 'newsletter_subscription_received')]
     public function subscriptionRevieced(): Response
     {
-        return $this->render('@pages/newsletter/subscription-received-notification.html.twig');
+        return $this->render(PageTemplatePath::NEWSLETTER_SUBSCRIPTION_RECEIVED);
     }
 
     /**
@@ -140,7 +141,7 @@ final class NewsletterSubscriptionController extends AbstractController implemen
         try {
             $newsletter->confirm($token);
 
-            return $this->render('@pages/newsletter/confirmation-notification.html.twig');
+            return $this->render(PageTemplatePath::NEWSLETTER_CONFIRMATION);
         } catch (ConfirmationPeriodExpiredException) {
             return new Response(status: Response::HTTP_GONE);
         } catch (ConfirmationContractNotFoundException) {
@@ -159,7 +160,7 @@ final class NewsletterSubscriptionController extends AbstractController implemen
         try {
             $newsletter->unsubscribe($token);
 
-            return $this->render('@pages/newsletter/cancellation-notification.html.twig');
+            return $this->render(PageTemplatePath::NEWSLETTER_CANCELLATION);
         } catch (ConfirmationContractNotFoundException) {
             return new Response(status: Response::HTTP_NOT_FOUND);
         }
@@ -173,6 +174,6 @@ final class NewsletterSubscriptionController extends AbstractController implemen
     #[Route('/newsletter_already_subscribed/', name: 'newsletter_already_subscribed')]
     public function alreadySubscribed(): Response
     {
-        return $this->render('@pages/newsletter/already-subscribed-notification.html.twig');
+        return $this->render(PageTemplatePath::NEWSLETTER_ALREADY_SUBSCRIBED);
     }
 }

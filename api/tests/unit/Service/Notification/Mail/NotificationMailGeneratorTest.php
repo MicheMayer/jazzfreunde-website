@@ -9,6 +9,7 @@ use Jazzfreunde\App\Entity\Notification\NotificationSubscription;
 use Jazzfreunde\App\Message\Messages\Email\EmailNotification;
 use Jazzfreunde\App\Service\Notification\Mail\NotificationMailGenerator;
 use Jazzfreunde\App\Service\Notification\Provider\Model\NotificationResource;
+use Jazzfreunde\App\Service\Twig\EmailTemplatePath;
 use Jazzfreunde\App\Type\Enum\KnownMailHandleEnum;
 use Jazzfreunde\App\Type\Primitive\Email;
 use Jazzfreunde\App\Type\Primitive\HexToken;
@@ -30,7 +31,7 @@ final class NotificationMailGeneratorTest extends TestCase
     {
         $resource = new NotificationResource(
             uri: new Uri('/events/42'),
-            email_template: 'email/notifications/event-notification.html.twig',
+            email_template: EmailTemplatePath::EVENT_NOTIFICATION,
             title: 'Jazz concert',
             metadata: [
                 'event' => ['title' => 'Jazz concert'],
@@ -89,7 +90,7 @@ final class NotificationMailGeneratorTest extends TestCase
         $generator->generate(
             new NotificationResource(
                 uri: new Uri('/events/42'),
-                email_template: 'email/notifications/event-notification.html.twig',
+                email_template: EmailTemplatePath::EVENT_NOTIFICATION,
                 title: 'Jazz concert',
             ),
             [],

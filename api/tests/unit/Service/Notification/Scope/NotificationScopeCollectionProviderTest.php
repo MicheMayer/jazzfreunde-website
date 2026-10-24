@@ -9,6 +9,7 @@ use Jazzfreunde\App\Service\Notification\Scope\CompiledScope;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollection;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCollectionProvider;
 use Jazzfreunde\App\Service\Notification\Scope\NotificationScopeCompilerInterface;
+use Jazzfreunde\App\Type\Primitive\Uri;
 use Jazzfreunde\UnitTest\UnitUnderTest;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -50,7 +51,7 @@ final class NotificationScopeCollectionProviderTest extends TestCase
      */
     public function testProvideCallsCompilerWhenCacheIsEmpty(): void
     {
-        $scope = new CompiledScope('~^/events/(\d+)$~', [], stdClass::class);
+        $scope = new CompiledScope('~^/events/(\d+)$~', [], stdClass::class, Uri::from('/events/{id:number}'));
         $uut = new UnitUnderTest(NotificationScopeCollectionProvider::class);
         $compiler = $uut->mock(NotificationScopeCompilerInterface::class);
         $compiler
@@ -85,7 +86,7 @@ final class NotificationScopeCollectionProviderTest extends TestCase
     public function testProvideDoesNotCallCompilerWhenCacheExists(): void
     {
         $cachedCollection = new NotificationScopeCollection();
-        $cachedCollection->add(new CompiledScope('~^/events/(\d+)$~', [], stdClass::class));
+        $cachedCollection->add(new CompiledScope('~^/events/(\d+)$~', [], stdClass::class, Uri::from('/events/{id:number}')));
 
         $uut = new UnitUnderTest(NotificationScopeCollectionProvider::class);
         $compiler = $uut->mock(NotificationScopeCompilerInterface::class);
