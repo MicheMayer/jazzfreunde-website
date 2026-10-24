@@ -21,6 +21,7 @@ export const CategoryBadge = ({ category }: CategoryBadgeProps) => {
             case 'session': return 'Session'
             case 'jazztage': return 'Ingolstädter Jazztage'
             case 'jazz-and-literature': return 'Jazz & Literatur'
+            case 'jazz-the-kiesch': return 'Jazz the Kiesch'
             default: return null
         }
     })()

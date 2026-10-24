@@ -591,6 +591,7 @@ components:
             - session
             - jazztage
             - jazz-and-literature
+            - jazz-the-kiesch
         notificationSource:
           anyOf:
             -
@@ -635,6 +636,7 @@ components:
             - session
             - jazztage
             - jazz-and-literature
+            - jazz-the-kiesch
         notificationSource:
           anyOf:
             -
