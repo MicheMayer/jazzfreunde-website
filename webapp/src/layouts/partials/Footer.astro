@@ -1,0 +1,17 @@
+---
+import { SITE_TITLE } from 'src/consts'
+import * as styles from './Footer.css'
+import { Container } from '@michemayer/astro-components/components'
+
+const today = new Date()
+---
+
+<footer id="footer">
+  <Container>
+    
+    <p>
+      &copy; {today.getFullYear()}&nbsp;
+      {SITE_TITLE}. All rights reserved.
+    </p>
+  </Container>
+</footer>

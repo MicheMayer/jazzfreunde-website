@@ -1,5 +1,6 @@
 ---
 import { Head } from '@michemayer/astro-components/components'
+import Footer from './partials/Footer.astro'
 import ThemeProvider from '@components/providers/ThemeProvider.astro'
 import type { Favicon } from '@michemayer/astro-components/models'
 import * as styles from './BaseLayout.css.ts'
@@ -37,6 +38,7 @@ const { title, description, image = 'full-logo-with-background.png' } = Astro.pr
         <slot />
       </main>
     </div>
+    <Footer />
   </ThemeProvider>
 </html>
 
